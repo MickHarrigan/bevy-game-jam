@@ -57,6 +57,7 @@ webbrowser = { version = "0.8", features = ["hardened"] }
 # keep the following in sync with Bevy's dependencies
 winit = { version = "0.28.7", default-features = false }
 image = { version = "0.24", default-features = false }
+bevy_ecs_ldtk = "0.8.0"
 
 [build-dependencies]
 embed-resource = "1.4"

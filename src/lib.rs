@@ -1,5 +1,14 @@
 #![allow(clippy::type_complexity)]
 
+const HELP_FONT_SIZE: f32 = 1.0;
+const TEXT_COLOR: Color = Color::Rgba {
+    red: 0.,
+    green: 0.5,
+    blue: 0.5,
+    alpha: 1.,
+};
+const HELP_TEXT_PADDING: Val = Val::Px(15.0);
+
 mod actions;
 mod audio;
 mod loading;
@@ -39,13 +48,43 @@ impl Plugin for GamePlugin {
             LoadingPlugin,
             MenuPlugin,
             ActionsPlugin,
-            InternalAudioPlugin,
-            PlayerPlugin,
+            // InternalAudioPlugin,
+            // PlayerPlugin,
         ));
 
         #[cfg(debug_assertions)]
         {
-            app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()));
+            app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()))
+                .add_systems(Startup, setup_entity_count)
+                .add_systems(Update, update_entity_count);
         }
     }
+}
+
+#[derive(Component)]
+struct EntityCount;
+
+fn setup_entity_count(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn((
+        TextBundle::from_section(
+            "",
+            TextStyle {
+                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font_size: HELP_FONT_SIZE,
+                color: TEXT_COLOR,
+            },
+        )
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: HELP_TEXT_PADDING,
+            right: HELP_TEXT_PADDING,
+            ..default()
+        }),
+        EntityCount,
+    ));
+}
+
+fn update_entity_count(entities: Query<Entity>, mut counters: Query<&mut Text, With<EntityCount>>) {
+    let mut text = counters.single_mut();
+    text.sections[0].value = format!("Entities: {:?}", entities.iter().len());
 }
