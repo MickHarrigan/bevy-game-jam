@@ -24,6 +24,9 @@ lto = "thin"
 [features]
 dev = ["bevy/dynamic_linking"]
 
+[patch.crates-io]
+bevy_ecs_tilemap = { git = "https://github.com/divark/bevy_ecs_tilemap", branch = "0.12-fixes" }
+
 # All of Bevy's default features exept for the audio related ones (bevy_audio, vorbis), since they clash with bevy_kira_audio
 #   and android_shared_stdcxx, since that is covered in `mobile`
 [dependencies]
@@ -57,7 +60,8 @@ webbrowser = { version = "0.8", features = ["hardened"] }
 # keep the following in sync with Bevy's dependencies
 winit = { version = "0.28.7", default-features = false }
 image = { version = "0.24", default-features = false }
-bevy_ecs_ldtk = "0.8.0"
+bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk.git", branch = "feat/bevy-0.12" }
+
 
 [build-dependencies]
 embed-resource = "1.4"
