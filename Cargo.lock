@@ -604,6 +604,7 @@ dependencies = [
  "bevy_asset_loader",
  "bevy_ecs_ldtk",
  "bevy_kira_audio",
+ "bevy_pancam",
  "embed-resource",
  "image",
  "rand",
@@ -804,6 +805,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b596c41a56f2268ec7cde560edc588bc7b5886e4b49c8b27c4dcc9f7c743424c"
 dependencies = [
  "glam",
+]
+
+[[package]]
+name = "bevy_pancam"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0fc188c00741b4e7736cf1ba8e394abce7daf479284f5ca551408d36147c7bd"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]

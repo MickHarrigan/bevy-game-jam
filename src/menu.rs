@@ -2,6 +2,7 @@ use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_pancam::{PanCam, PanCamPlugin};
 
 pub struct MenuPlugin;
 
@@ -15,7 +16,8 @@ impl Plugin for MenuPlugin {
             // .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
             // .add_plugins(LdtkPlugin)
             .insert_resource(LevelSelection::index(0))
-            .add_systems(OnEnter(GameState::Playing), setup_level);
+            .add_systems(OnEnter(GameState::Playing), setup_level)
+            .add_plugins(PanCamPlugin::default());
     }
 }
 
@@ -60,8 +62,7 @@ fn setup_level(
 
 fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
     info!("menu");
-    commands.spawn(Camera2dBundle::default());
-    // let mut camera = Camera2dBundle::default();
+    commands.spawn(Camera2dBundle::default()).insert(PanCam::default());
 
     commands
         .spawn((
