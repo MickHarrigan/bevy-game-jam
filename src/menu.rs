@@ -1,7 +1,7 @@
 use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
+// use bevy_ecs_ldtk::prelude::*;
 use bevy_pancam::{PanCam, PanCamPlugin};
 
 pub struct MenuPlugin;
@@ -14,9 +14,9 @@ impl Plugin for MenuPlugin {
             .add_systems(Update, click_play_button.run_if(in_state(GameState::Menu)))
             .add_systems(OnExit(GameState::Menu), cleanup_menu)
             // LDtk level selection resource
-            .insert_resource(LevelSelection::index(0))
-            .add_systems(OnEnter(GameState::Playing), setup_level)
-            .add_plugins(LdtkPlugin)
+            // .insert_resource(LevelSelection::index(0))
+            // .add_systems(OnEnter(GameState::Playing), setup_level)
+            // .add_plugins(LdtkPlugin)
             .add_plugins(PanCamPlugin::default());
     }
 }
@@ -39,26 +39,26 @@ impl Default for ButtonColors {
 #[derive(Component)]
 struct Menu;
 
-fn setup_level(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut camera: Query<(&mut Transform, &mut OrthographicProjection), With<Camera2d>>,
-) {
-    // Change camera settings on playing state
-    info!("Change camera settings on playing state");
-    for (mut transform, mut projection) in &mut camera {
-        projection.scale = 0.5;
-        transform.translation.x += 1280.0 / 4.0;
-        transform.translation.y += 720.0 / 4.0;
-    }
+// fn setup_level(
+//     mut commands: Commands,
+//     asset_server: Res<AssetServer>,
+//     mut camera: Query<(&mut Transform, &mut OrthographicProjection), With<Camera2d>>,
+// ) {
+//     // Change camera settings on playing state
+//     info!("Change camera settings on playing state");
+//     for (mut transform, mut projection) in &mut camera {
+//         projection.scale = 0.5;
+//         transform.translation.x += 1280.0 / 4.0;
+//         transform.translation.y += 720.0 / 4.0;
+//     }
 
-    // Spawn LDTK level
-    info!("Spawn LDTK level");
-    commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("world.ldtk"),
-        ..Default::default()
-    });
-}
+//     // Spawn LDTK level
+//     info!("Spawn LDTK level");
+//     commands.spawn(LdtkWorldBundle {
+//         ldtk_handle: asset_server.load("world.ldtk"),
+//         ..Default::default()
+//     });
+// }
 
 fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
     info!("menu");
