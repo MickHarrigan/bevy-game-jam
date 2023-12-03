@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_pancam::PanCam;
 use crate::GameState;
 
 // use bevy_pancam::{PanCam, PanCamPlugin};
@@ -27,14 +28,17 @@ impl Plugin for WorldPlugin {
 fn setup_level(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut camera: Query<(&mut Transform, &mut OrthographicProjection), With<Camera2d>>,
+    mut camera: Query<(&mut Transform, &mut OrthographicProjection, &mut PanCam), With<Camera2d>>,
 ) {
     // Change camera settings on playing state
     info!("Change camera settings on playing state");
-    for (mut transform, mut projection) in &mut camera {
-        projection.scale = 0.5;
-        transform.translation.x += 1280.0 / 4.0;
-        transform.translation.y += 720.0 / 4.0;
+    for (mut transform, mut projection, mut pancam) in &mut camera {
+        // Set world camera scale and location
+        projection.scale = 0.25;
+        transform.translation.x = 30.0;
+        transform.translation.y = 30.0;
+        // Enable pancam plugin
+        pancam.enabled = true;
     }
 
     // Spawn LDTK level
