@@ -16,8 +16,11 @@ impl Plugin for WorldPlugin {
             .insert_resource(LevelSelection::index(0))
             .add_systems(OnEnter(GameState::Playing), setup_level)
             // .add_systems(OnExit(GameState::Playing), cleanup_world)
-            .add_plugins(LdtkPlugin);
+            .add_plugins(LdtkPlugin)
             // .add_plugins(PanCamPlugin::default());
+            // Register LDtk entities
+            .register_ldtk_entity::<QueenBundle>("Queen")
+            .register_ldtk_entity::<EnemyQueenBundle>("EnemyQueen");
     }
 }
 
@@ -47,3 +50,16 @@ fn setup_level(
 //         commands.entity(entity).despawn_recursive();
 //     }
 // }
+
+// Spawning sprites for LDtk entities
+#[derive(Default, Bundle, LdtkEntity)]
+struct QueenBundle {
+    #[sprite_sheet_bundle]
+    sprite_sheet_bundle: SpriteSheetBundle,
+}
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct EnemyQueenBundle {
+    #[sprite_sheet_bundle]
+    sprite_sheet_bundle: SpriteSheetBundle,
+}
