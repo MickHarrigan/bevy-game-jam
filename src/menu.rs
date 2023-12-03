@@ -13,10 +13,10 @@ impl Plugin for MenuPlugin {
         app.add_systems(OnEnter(GameState::Menu), setup_menu)
             .add_systems(Update, click_play_button.run_if(in_state(GameState::Menu)))
             .add_systems(OnExit(GameState::Menu), cleanup_menu)
-            // .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-            // .add_plugins(LdtkPlugin)
+            // LDtk level selection resource
             .insert_resource(LevelSelection::index(0))
             .add_systems(OnEnter(GameState::Playing), setup_level)
+            .add_plugins(LdtkPlugin)
             .add_plugins(PanCamPlugin::default());
     }
 }
@@ -62,7 +62,15 @@ fn setup_level(
 
 fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
     info!("menu");
-    commands.spawn(Camera2dBundle::default()).insert(PanCam::default());
+    commands.spawn(Camera2dBundle::default()).insert(PanCam {
+        grab_buttons: vec![MouseButton::Left, MouseButton::Middle], // which buttons should drag the camera
+        enabled: true, // when false, controls are disabled. See toggle example.
+        zoom_to_cursor: true, // whether to zoom towards the mouse or the center of the screen
+        min_scale: 1., // prevent the camera from zooming too far in
+        max_scale: Some(40.), // prevent the camera from zooming too far out
+        // Optinally specify min_x, max_x, min_y, max_y to limit the camera's movement
+        ..Default::default()
+    });
 
     commands
         .spawn((
