@@ -54,14 +54,14 @@ impl Plugin for GamePlugin {
             ActionsPlugin,
             // InternalAudioPlugin,
             // PlayerPlugin,
-
             WorldPlugin,
         ));
 
         #[cfg(debug_assertions)]
         {
-            app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()))
-                .add_systems(Startup, setup_entity_count)
+            // app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()))
+            // .add_systems(Startup, setup_entity_count)
+            app.add_systems(Startup, setup_entity_count)
                 .add_systems(Update, update_entity_count);
         }
     }

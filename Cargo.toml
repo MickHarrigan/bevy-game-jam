@@ -62,6 +62,7 @@ winit = { version = "0.28.7", default-features = false }
 image = { version = "0.24", default-features = false }
 bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk.git", branch = "feat/bevy-0.12" }
 bevy_pancam = "0.10.0"
+bevy_mod_picking = "0.17.0"
 
 
 [build-dependencies]
