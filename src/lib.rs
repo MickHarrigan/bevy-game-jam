@@ -16,6 +16,7 @@ mod menu;
 mod player;
 
 mod world;
+mod bees;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -24,6 +25,7 @@ use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
 
 use crate::world::WorldPlugin;
+use crate::bees::BeesPlugin;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -56,6 +58,7 @@ impl Plugin for GamePlugin {
             // PlayerPlugin,
 
             WorldPlugin,
+            BeesPlugin,
         ));
 
         #[cfg(debug_assertions)]

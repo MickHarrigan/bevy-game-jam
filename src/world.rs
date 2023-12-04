@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crate::GameState;
-use bevy::{prelude::*, sprite::PrepareNextFrameMaterials};
+use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_pancam::PanCam;
 
@@ -65,9 +65,13 @@ fn setup_level(
 //     }
 // }
 
+
+#[derive(Default, Component)]
+pub struct Queen;
 // Spawning sprites for LDtk entities
 #[derive(Default, Bundle, LdtkEntity)]
 struct QueenBundle {
+    queen: Queen,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
 }
