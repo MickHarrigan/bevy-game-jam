@@ -1,11 +1,12 @@
 use std::time::Duration;
 
 use crate::GameState;
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::PrepareNextFrameMaterials};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_pancam::PanCam;
 
 use crate::loading::TextureAssets;
+use crate::menu::NextLevel;
 
 // use bevy_pancam::{PanCam, PanCamPlugin};
 
@@ -36,6 +37,7 @@ impl Plugin for WorldPlugin {
 fn setup_level(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    level: Res<NextLevel>,
     mut camera: Query<(&mut Transform, &mut OrthographicProjection, &mut PanCam), With<Camera2d>>,
 ) {
     // Change camera settings on playing state
@@ -52,7 +54,7 @@ fn setup_level(
     // Spawn LDTK level
     info!("Spawn LDTK level");
     commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("world.ldtk"),
+        ldtk_handle: asset_server.load(level.0),
         ..Default::default()
     });
 }
@@ -149,4 +151,3 @@ fn bullet_movement(
         }
     }
 }
-

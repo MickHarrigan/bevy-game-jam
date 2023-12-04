@@ -13,6 +13,7 @@ impl Plugin for MenuPlugin {
         app.add_systems(OnEnter(GameState::Menu), setup_menu)
             .add_systems(Update, click_play_button.run_if(in_state(GameState::Menu)))
             .add_systems(OnExit(GameState::Menu), cleanup_menu)
+            .insert_resource(NextLevel(""))
             // LDtk level selection resource
             // .insert_resource(LevelSelection::index(0))
             // .add_systems(OnEnter(GameState::Playing), setup_level)
@@ -39,14 +40,13 @@ impl Default for ButtonColors {
 #[derive(Component)]
 struct Menu;
 
-
 fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
     info!("menu");
     commands.spawn(Camera2dBundle::default()).insert(PanCam {
         grab_buttons: vec![MouseButton::Left, MouseButton::Middle], // which buttons should drag the camera
-        enabled: false, // when false, controls are disabled. See toggle example.
+        enabled: false,       // when false, controls are disabled. See toggle example.
         zoom_to_cursor: true, // whether to zoom towards the mouse or the center of the screen
-        min_scale: 0.1, // prevent the camera from zooming too far in
+        min_scale: 0.1,       // prevent the camera from zooming too far in
         max_scale: Some(50.), // prevent the camera from zooming too far out
         // Optinally specify min_x, max_x, min_y, max_y to limit the camera's movement
         min_x: Some(-100.),
@@ -55,6 +55,51 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
         max_y: Some(400.),
     });
 
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    flex_direction: FlexDirection::Row,
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::SpaceBetween,
+                    ..default()
+                },
+                ..default()
+            },
+            Menu,
+        ))
+        .with_children(|children| {
+            let button_colors = ButtonColors::default();
+            children
+                .spawn((
+                    ButtonBundle {
+                        style: Style {
+                            width: Val::Px(140.0),
+                            height: Val::Px(50.0),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..Default::default()
+                        },
+                        background_color: button_colors.normal.into(),
+                        ..Default::default()
+                    },
+                    button_colors,
+                    ChangeState(GameState::Playing),
+                    StartLevel("world.ldtk"),
+                ))
+                .with_children(|parent| {
+                    parent.spawn(TextBundle::from_section(
+                        "Play default world",
+                        TextStyle {
+                            font_size: 40.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                            ..default()
+                        },
+                    ));
+                });
+        });
     commands
         .spawn((
             NodeBundle {
@@ -87,10 +132,11 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                     },
                     button_colors,
                     ChangeState(GameState::Playing),
+                    StartLevel("testworld.ldtk"),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "Play",
+                        "Play test world",
                         TextStyle {
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
@@ -201,8 +247,15 @@ struct ChangeState(GameState);
 #[derive(Component)]
 struct OpenLink(&'static str);
 
+#[derive(Component)]
+struct StartLevel(&'static str);
+
+#[derive(Resource)]
+pub struct NextLevel(pub &'static str);
+
 fn click_play_button(
     mut next_state: ResMut<NextState<GameState>>,
+    mut next_level: ResMut<NextLevel>,
     mut interaction_query: Query<
         (
             &Interaction,
@@ -210,13 +263,19 @@ fn click_play_button(
             &ButtonColors,
             Option<&ChangeState>,
             Option<&OpenLink>,
+            Option<&StartLevel>,
         ),
         (Changed<Interaction>, With<Button>),
     >,
 ) {
-    for (interaction, mut color, button_colors, change_state, open_link) in &mut interaction_query {
+    for (interaction, mut color, button_colors, change_state, open_link, start_level) in
+        &mut interaction_query
+    {
         match *interaction {
             Interaction::Pressed => {
+                if let Some(level) = start_level {
+                    next_level.0 = level.0;
+                }
                 if let Some(state) = change_state {
                     next_state.set(state.0.clone());
                 } else if let Some(link) = open_link {
