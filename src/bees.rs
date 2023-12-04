@@ -57,8 +57,8 @@ fn spawn_bee(
         let queen_transform = query.single();
         commands.spawn((
             SpriteSheetBundle {
-                texture_atlas: textures.shmup.clone(),
-                sprite: TextureAtlasSprite::new(12),
+                texture_atlas: textures.planes.clone(),
+                sprite: TextureAtlasSprite::new(11),
                 transform: Transform::from_xyz(
                     queen_transform.translation.x,
                     queen_transform.translation.y,
