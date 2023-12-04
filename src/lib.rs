@@ -15,9 +15,8 @@ mod loading;
 mod menu;
 mod player;
 
-mod world;
 mod bees;
-mod debug;
+mod world;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -25,14 +24,15 @@ use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
 
-use crate::world::WorldPlugin;
 use crate::bees::BeesPlugin;
-use crate::debug::DebugPlugin;
+use crate::world::WorldPlugin;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+#[cfg(debug_assertions)]
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -58,17 +58,19 @@ impl Plugin for GamePlugin {
             ActionsPlugin,
             // InternalAudioPlugin,
             // PlayerPlugin,
-
             WorldPlugin,
             BeesPlugin,
-            DebugPlugin,
         ));
 
         #[cfg(debug_assertions)]
         {
-            app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()))
-                .add_systems(Startup, setup_entity_count)
-                .add_systems(Update, update_entity_count);
+            app.add_plugins((
+                FrameTimeDiagnosticsPlugin,
+                LogDiagnosticsPlugin::default(),
+                WorldInspectorPlugin::new(),
+            ))
+            .add_systems(Startup, setup_entity_count)
+            .add_systems(Update, update_entity_count);
         }
     }
 }
