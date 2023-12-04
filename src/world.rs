@@ -65,7 +65,6 @@ fn setup_level(
 //     }
 // }
 
-
 #[derive(Default, Component)]
 pub struct Queen;
 // Spawning sprites for LDtk entities
