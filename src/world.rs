@@ -31,15 +31,15 @@ impl Plugin for WorldPlugin {
             // Register LDtk entities
             .register_ldtk_entity::<QueenBundle>("Queen")
             .register_ldtk_entity::<EnemyQueenBundle>("EnemyQueen");
-            // .register_ldtk_entity::<TowerBundle>("Tower")
-            // .add_systems(OnEnter(GameState::Playing), setup_tower_shooting)
-            // .add_systems(Update, tower_shoot.run_if(in_state(GameState::Playing)))
-            // .add_systems(Update, bullet_movement.run_if(in_state(GameState::Playing)));
+        // .register_ldtk_entity::<TowerBundle>("Tower")
+        // .add_systems(OnEnter(GameState::Playing), setup_tower_shooting)
+        // .add_systems(Update, tower_shoot.run_if(in_state(GameState::Playing)))
+        // .add_systems(Update, bullet_movement.run_if(in_state(GameState::Playing)));
     }
 }
 
 #[derive(Resource, Default)]
-struct LdtkLevel(pub Handle<LdtkProject>);
+pub struct LdtkLevel(pub Handle<LdtkProject>);
 
 fn setup_level(
     mut commands: Commands,

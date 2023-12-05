@@ -16,6 +16,7 @@ mod menu;
 mod player;
 
 mod bees;
+mod boids;
 mod world;
 
 use crate::actions::ActionsPlugin;
