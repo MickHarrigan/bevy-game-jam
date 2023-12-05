@@ -2,4 +2,4 @@ The bees are hungry and need to fuel their way back home
 
 
 
-Objective: Harvest enough flowers to fill the colony's energy level. Once the energy level surpasses the hive energy requirement threshold, welcome home bees.
+Objective: Get enough pollen to be able to lift the flag out of the literal ground as bees and bring it back to the hive.
