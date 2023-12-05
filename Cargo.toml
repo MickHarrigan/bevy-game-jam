@@ -16,6 +16,12 @@ opt-level = 1
 lto = true
 codegen-units = 1
 
+[profile.dev.package."bevy-inspector-egui"]
+opt-level = 1
+
+[profile.release.package."bevy-inspector-egui"]
+opt-level = 1
+
 # The profile that 'cargo dist' will build with
 [profile.dist]
 inherits = "release"
