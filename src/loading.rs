@@ -33,6 +33,28 @@ pub struct TextureAssets {
     pub bevy: Handle<Image>,
     #[asset(path = "textures/github.png")]
     pub github: Handle<Image>,
+    #[asset(texture_atlas(
+        tile_size_x = 16.,
+        tile_size_y = 16.,
+        columns = 12,
+        rows = 10,
+        padding_x = 0.,
+        padding_y = 0.,
+        offset_x = 0.,
+        offset_y = 0.
+    ))]
     #[asset(path = "shmup.png")]
     pub shmup: Handle<TextureAtlas>,
+    #[asset(texture_atlas(
+        tile_size_x = 32.,
+        tile_size_y = 32.,
+        columns = 4,
+        rows = 6,
+        padding_x = 0.,
+        padding_y = 0.,
+        offset_x = 0.,
+        offset_y = 0.
+    ))]
+    #[asset(path = "airplanes.png")]
+    pub planes: Handle<TextureAtlas>,
 }

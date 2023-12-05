@@ -132,11 +132,11 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                     },
                     button_colors,
                     ChangeState(GameState::Playing),
-                    StartLevel("testworld.ldtk"),
+                    StartLevel("demo.ldtk"),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "Play test world",
+                        "Play demo world",
                         TextStyle {
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
