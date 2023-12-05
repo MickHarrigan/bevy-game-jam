@@ -4,6 +4,7 @@ use rand::Rng;
 // use crate::world::Queen;
 use crate::{loading::TextureAssets, GameState};
 use bevy::prelude::*;
+use bevy::sprite::collide_aabb::{collide, Collision};
 use bevy::window::PrimaryWindow;
 use bevy_pancam::PanCam;
 
@@ -41,12 +42,20 @@ impl Velocity {
 #[derive(Component)]
 struct Bee;
 
+// Seperate out these types of data???
 #[derive(Component)]
-struct Boid {
+struct BoidGroup {
+    id: u32,
+    boids: Vec<Entity>,
     seperation: f32,
     alignment: f32,
     cohesion: f32,
+    speed: f32,
+    vision: f32,
 }
+
+#[derive(Component)]
+struct Boid
 
 #[derive(Resource)]
 struct MousePosition {
@@ -109,15 +118,18 @@ fn place_bee(
 
 // Move bees according to velocity
 fn move_bee(
-    mut query: Query<(&mut Transform, &mut Velocity), With<Bee>>,
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Collider), With<Bee>>,
     time: Res<Time>,
 ) {
     // let speed = 25.0;
-    for (mut transform, velocity) in query.iter_mut() {
+    for (mut transform, velocity, collider) in query.iter_mut() {
         transform.translation.x += velocity.0.x * time.delta_seconds();
         transform.translation.y += velocity.0.y * time.delta_seconds();
 
         transform.rotation = Quat::from_rotation_arc(Vec3::Y, velocity.0.normalize());
+
+        // Print all bee collisions
+        
     }
 }
 
