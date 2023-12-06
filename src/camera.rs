@@ -1,6 +1,7 @@
 use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 use crate::GameState;
+use crate::world::LevelData;
 
 pub struct CameraPlugin;
 
@@ -26,22 +27,36 @@ fn setup_camera_controls(
 fn panning_controls
 (
     keys: Res<Input<KeyCode>>,
-    mut q_cam: Query<&mut Transform, With<Camera2d>>
+    mut q_cam: Query<&mut Transform, With<Camera2d>>,
+    level_data: Res<LevelData>
 )
 {
     let pan_speed = 2.0;
     let (mut cam_transform) = q_cam.single_mut();
+    info!("Cam Translation {:?}", cam_transform.translation);
     if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
         cam_transform.translation.y += pan_speed;
+        if cam_transform.translation.y > level_data.level_height as f32 {
+            cam_transform.translation.y = level_data.level_height as f32;
+        }
     }
     if keys.pressed(KeyCode::A) || keys.pressed(KeyCode::Left) {
         cam_transform.translation.x -= pan_speed;
+        if cam_transform.translation.x < 0.0 {
+            cam_transform.translation.x = 0.0;
+        }
     }
     if keys.pressed(KeyCode::S) || keys.pressed(KeyCode::Down) {
         cam_transform.translation.y -= pan_speed;
+        if cam_transform.translation.y < 0.0 {
+            cam_transform.translation.y = 0.0;
+        }
     }
     if keys.pressed(KeyCode::D) || keys.pressed(KeyCode::Right) {
         cam_transform.translation.x += pan_speed;
+        if cam_transform.translation.x > level_data.level_width as f32 {
+            cam_transform.translation.x = level_data.level_width as f32;
+        }
     }
 }
 

@@ -24,6 +24,7 @@ impl Plugin for WorldPlugin {
             .insert_resource(LevelSelection::index(0))
             .init_resource::<LdtkLevel>()
             .add_systems(OnEnter(GameState::Playing), setup_level)
+            .insert_resource(LevelData { level_height: 0, level_width: 0 })
             .add_systems(Update, get_level_data.run_if(in_state(GameState::Playing)))
             // .add_systems(OnExit(GameState::Playing), cleanup_world)
             .add_plugins(LdtkPlugin)
@@ -68,11 +69,18 @@ fn setup_level(
     });
 }
 
+#[derive(Resource, Debug)]
+pub struct LevelData {
+    pub level_height: i32,
+    pub level_width: i32,
+}
+
 fn get_level_data(
     level: Res<Assets<LdtkProject>>,
     // mut camera: Query<Camera>,
     handle: Res<LdtkLevel>,
     mut loaded: Local<bool>,
+    mut level_data: ResMut<LevelData>,
 ) {
     // get the level of a handle
     if *loaded {
@@ -81,8 +89,8 @@ fn get_level_data(
 
     // let mut pancam = camera.single_mut();
     if let Some(data) = level.get(&handle.0) {
-        // let height = data.iter_root_levels().next().unwrap().px_hei;
-        // let width = data.iter_root_levels().next().unwrap().px_wid;
+        level_data.level_height = data.iter_root_levels().next().unwrap().px_hei;
+        level_data.level_width = data.iter_root_levels().next().unwrap().px_wid;
         // pancam.min_scale = 0.1;
         // pancam.max_scale = Some(100.);
         // pancam.max_x = Some(width as f32);
