@@ -32,7 +32,7 @@ fn panning_controls
 )
 {
     let pan_speed = 2.0;
-    let (mut cam_transform) = q_cam.single_mut();
+    let mut cam_transform = q_cam.single_mut();
     info!("Cam Translation {:?}", cam_transform.translation);
     if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
         cam_transform.translation.y += pan_speed;
@@ -70,7 +70,7 @@ fn zooming_controls
     let zoom_speed = 0.2;
     let max_scale = 5.0;
     let min_scale = 0.2;
-    for ev in scroll_evr.iter() {
+    for ev in scroll_evr.read() {
         use bevy::input::mouse::MouseScrollUnit;
         let mut projection = q_camera.single_mut();
         // info!("Current projection value: {:?}", projection.scale);

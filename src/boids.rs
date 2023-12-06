@@ -42,9 +42,9 @@ pub fn update_boids(
     };
     query
         .iter_mut()
-        .for_each(|(transform, mut collider, mut velocity)| {
-            let x = transform.translation.x as i32;
-            let y = transform.translation.y as i32;
+        .for_each(|(transform, collider, mut velocity)| {
+            // let x = transform.translation.x as i32;
+            // let y = transform.translation.y as i32;
             // let win = universe.graph.size();
 
             // -------------------- collision query --------------------
@@ -88,10 +88,10 @@ pub fn update_boids(
                 direction += separation.normalize() * universe.separation;
             }
 
-            let mut new_velocity = direction.normalize() * velocity.0.length();
+            let new_velocity = direction.normalize() * velocity.0.length();
 
             // -------------------- World Border --------------------
-            let margin: i32 = 20;
+            // let margin: i32 = 20;
             // if (x < win.min.x + margin && velocity.value.x < 0.0)
             //     || (x > win.max.x - margin && velocity.value.x > 0.0)
             // {

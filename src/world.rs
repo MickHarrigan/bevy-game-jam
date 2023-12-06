@@ -1,16 +1,8 @@
-use std::time::Duration;
-
 use crate::GameState;
-use bevy::asset::LoadState;
 use bevy::prelude::*;
-use bevy::render::render_resource::AsBindGroupShaderType;
 use bevy_ecs_ldtk::prelude::*;
-// use bevy_pancam::PanCam;
 
-use crate::loading::TextureAssets;
 use crate::menu::NextLevel;
-
-// use bevy_pancam::{PanCam, PanCamPlugin};
 
 pub struct WorldPlugin;
 
