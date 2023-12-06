@@ -15,7 +15,7 @@ use crate::{
 };
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_pancam::PanCam;
+// use bevy_pancam::PanCam;
 
 pub struct BeesPlugin;
 
@@ -156,16 +156,17 @@ fn setup(mut commands: Commands) {
 
 // Update mouse position
 fn update_cursor(
-    q_cam: Query<(&Camera, &GlobalTransform), With<PanCam>>,
+    q_cam: Query<(&Camera, &GlobalTransform)>,
     q_window: Query<&Window, With<PrimaryWindow>>,
     mut mouse_position: ResMut<MousePosition>,
 ) {
-    let (cam, cam_trans) = q_cam.single();
+    let (camera, camera_transform) = q_cam.single();
     let window = q_window.single();
+
     if let Some(world_pos) = window
         .cursor_position()
-        .and_then(|cursor| cam.viewport_to_world(cam_trans, cursor))
-        .map(|ray| ray.origin.truncate())
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
+        // .map(|ray| ray.origin.truncate())
     {
         mouse_position.position = world_pos;
     }
@@ -195,22 +196,6 @@ fn place_bee(
             Velocity::default(),
         ));
         info!("Bee spawned");
-    }
-}
-
-// Move bees according to velocity
-fn move_bee(
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Collider), With<Bee>>,
-    time: Res<Time>,
-) {
-    // let speed = 25.0;
-    for (mut transform, velocity, collider) in query.iter_mut() {
-        transform.translation.x += velocity.0.x * time.delta_seconds();
-        transform.translation.y += velocity.0.y * time.delta_seconds();
-
-        transform.rotation = Quat::from_rotation_arc(Vec3::Y, velocity.0.normalize());
-
-        // Print all bee collisions
     }
 }
 

@@ -67,7 +67,6 @@ webbrowser = { version = "0.8", features = ["hardened"] }
 winit = { version = "0.28.7", default-features = false }
 image = { version = "0.24", default-features = false }
 bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk.git", branch = "feat/bevy-0.12" }
-bevy_pancam = { version = "0.10.0", features = ["bevy_egui"] }
 bevy-inspector-egui = "0.21.0"
 quadtree = { git = "https://github.com/MickHarrigan/quadtree.git" }
 
