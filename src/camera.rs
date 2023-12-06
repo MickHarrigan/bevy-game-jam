@@ -33,7 +33,7 @@ fn panning_controls
 {
     let pan_speed = 2.0;
     let mut cam_transform = q_cam.single_mut();
-    info!("Cam Translation {:?}", cam_transform.translation);
+    // info!("Cam Translation {:?}", cam_transform.translation);
     if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
         cam_transform.translation.y += pan_speed;
         if cam_transform.translation.y > level_data.level_height as f32 {

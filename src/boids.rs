@@ -42,7 +42,7 @@ pub fn update_boids(
     };
     query
         .iter_mut()
-        .for_each(|(transform, mut collider, mut velocity)| {
+        .for_each(|(transform, collider, mut velocity)| {
             let x = transform.translation.x as i32;
             let y = transform.translation.y as i32;
             // let win = universe.graph.size();

@@ -1,4 +1,4 @@
-use bevy::{math, prelude::*};
+use bevy::prelude::*;
 use rand::Rng;
 
 use crate::{
@@ -108,6 +108,7 @@ fn spawn_random_boids(
     }
 }
 
-fn edit_boid_groups(groups: Query<&BoidGroup>) {
-    // this should creat a window with a dropdown of all boidgroups and allow editing of all the values within
-}
+// this should create a window with a dropdown of all boidgroups and allow editing of all the values within
+// fn edit_boid_groups(groups: Query<&BoidGroup>) {
+//
+// }
