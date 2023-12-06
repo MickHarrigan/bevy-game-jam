@@ -13,7 +13,7 @@ use crate::{
 };
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_pancam::PanCam;
+// use bevy_pancam::PanCam;
 
 pub struct BeesPlugin;
 
@@ -133,16 +133,17 @@ fn setup(mut commands: Commands) {
 
 // Update mouse position
 fn update_cursor(
-    q_cam: Query<(&Camera, &GlobalTransform), With<PanCam>>,
+    q_cam: Query<(&Camera, &GlobalTransform)>,
     q_window: Query<&Window, With<PrimaryWindow>>,
     mut mouse_position: ResMut<MousePosition>,
 ) {
-    let (cam, cam_trans) = q_cam.single();
+    let (camera, camera_transform) = q_cam.single();
     let window = q_window.single();
+
     if let Some(world_pos) = window
         .cursor_position()
-        .and_then(|cursor| cam.viewport_to_world(cam_trans, cursor))
-        .map(|ray| ray.origin.truncate())
+        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
+        // .map(|ray| ray.origin.truncate())
     {
         mouse_position.position = world_pos;
     }

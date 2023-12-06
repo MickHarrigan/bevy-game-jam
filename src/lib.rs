@@ -15,6 +15,7 @@ mod loading;
 mod menu;
 mod player;
 
+mod camera;
 mod bees;
 mod boids;
 mod world;
@@ -27,6 +28,7 @@ use crate::player::PlayerPlugin;
 
 use crate::bees::BeesPlugin;
 use crate::world::WorldPlugin;
+use crate::camera::CameraPlugin;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -59,6 +61,7 @@ impl Plugin for GamePlugin {
             ActionsPlugin,
             // InternalAudioPlugin,
             // PlayerPlugin,
+            CameraPlugin,
             WorldPlugin,
             BeesPlugin,
         ));

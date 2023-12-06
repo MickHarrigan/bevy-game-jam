@@ -5,7 +5,7 @@ use bevy::asset::LoadState;
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroupShaderType;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_pancam::PanCam;
+// use bevy_pancam::PanCam;
 
 use crate::loading::TextureAssets;
 use crate::menu::NextLevel;
@@ -45,17 +45,15 @@ fn setup_level(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     level: Res<NextLevel>,
-    mut camera: Query<(&mut Transform, &mut OrthographicProjection, &mut PanCam), With<Camera2d>>,
+    mut camera: Query<(&mut Transform, &mut OrthographicProjection), With<Camera2d>>,
 ) {
     // Change camera settings on playing state
     info!("Change camera settings on playing state");
-    for (mut transform, mut projection, mut pancam) in &mut camera {
+    for (mut transform, mut projection) in &mut camera {
         // Set world camera scale and location
         projection.scale = 0.25;
         transform.translation.x = 30.0;
         transform.translation.y = 30.0;
-        // Enable pancam plugin
-        pancam.enabled = true;
     }
 
     let level_handle = asset_server.load(level.0);
@@ -72,7 +70,7 @@ fn setup_level(
 
 fn get_level_data(
     level: Res<Assets<LdtkProject>>,
-    mut camera: Query<&mut PanCam, With<Camera2d>>,
+    // mut camera: Query<Camera>,
     handle: Res<LdtkLevel>,
     mut loaded: Local<bool>,
 ) {
@@ -81,16 +79,16 @@ fn get_level_data(
         return;
     }
 
-    let mut pancam = camera.single_mut();
+    // let mut pancam = camera.single_mut();
     if let Some(data) = level.get(&handle.0) {
-        let height = data.iter_root_levels().next().unwrap().px_hei;
-        let width = data.iter_root_levels().next().unwrap().px_wid;
-        pancam.min_scale = 0.1;
-        pancam.max_scale = Some(100.);
-        pancam.max_x = Some(width as f32);
-        pancam.max_y = Some(height as f32);
-        pancam.min_x = Some(0.);
-        pancam.min_y = Some(0.);
+        // let height = data.iter_root_levels().next().unwrap().px_hei;
+        // let width = data.iter_root_levels().next().unwrap().px_wid;
+        // pancam.min_scale = 0.1;
+        // pancam.max_scale = Some(100.);
+        // pancam.max_x = Some(width as f32);
+        // pancam.max_y = Some(height as f32);
+        // pancam.min_x = Some(0.);
+        // pancam.min_y = Some(0.);
         *loaded = true;
     }
 }
