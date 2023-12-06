@@ -1,10 +1,12 @@
 use std::time::Duration;
 
+use crate::bees::BoidGroup;
 use crate::GameState;
 use bevy::asset::LoadState;
 use bevy::prelude::*;
 use bevy::render::render_resource::AsBindGroupShaderType;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 use bevy_pancam::PanCam;
 
 use crate::loading::TextureAssets;
@@ -23,18 +25,20 @@ impl Plugin for WorldPlugin {
             // LDtk level selection resource
             .insert_resource(LevelSelection::index(0))
             .init_resource::<LdtkLevel>()
+            .insert_resource(QuadTreeVisualizer(false))
+            .register_type::<QuadTreeVisualizer>()
             .add_systems(OnEnter(GameState::Playing), setup_level)
             .add_systems(Update, get_level_data.run_if(in_state(GameState::Playing)))
+            .add_systems(
+                Update,
+                visualize_quadtree.run_if(in_state(GameState::Playing)),
+            )
             // .add_systems(OnExit(GameState::Playing), cleanup_world)
             .add_plugins(LdtkPlugin)
             // .add_plugins(PanCamPlugin::default());
             // Register LDtk entities
             .register_ldtk_entity::<QueenBundle>("Queen")
             .register_ldtk_entity::<EnemyQueenBundle>("EnemyQueen");
-        // .register_ldtk_entity::<TowerBundle>("Tower")
-        // .add_systems(OnEnter(GameState::Playing), setup_tower_shooting)
-        // .add_systems(Update, tower_shoot.run_if(in_state(GameState::Playing)))
-        // .add_systems(Update, bullet_movement.run_if(in_state(GameState::Playing)));
     }
 }
 
@@ -117,76 +121,28 @@ struct EnemyQueenBundle {
     sprite_sheet_bundle: SpriteSheetBundle,
 }
 
-// #[derive(Default, Component)]
-// struct Tower;
+#[derive(Resource, Reflect, Default)]
+#[reflect(Resource)]
+struct QuadTreeVisualizer(pub bool);
 
-// #[derive(Default, Bundle, LdtkEntity)]
-// struct TowerBundle {
-//     tower: Tower,
-//     #[sprite_sheet_bundle]
-//     sprite_sheet_bundle: SpriteSheetBundle,
-// }
+fn visualize_quadtree(mut gizmos: Gizmos, vis: Res<QuadTreeVisualizer>, groups: Query<&BoidGroup>) {
+    if !vis.0 {
+        return;
+    }
+    for group in groups.iter() {
+        let regions = group.graph.get_regions();
+        regions.iter().for_each(|reg| {
+            let (min_x, min_y, max_x, max_y) = reg.into_f32();
 
-// #[derive(Default, Component)]
-// struct Bullet;
+            let bottom_left = Vec3::new(min_x, min_y, 0.0);
+            let bottom_right = Vec3::new(max_x, min_y, 0.0);
+            let top_right = Vec3::new(max_x, max_y, 0.0);
+            let top_left = Vec3::new(min_x, max_y, 0.0);
 
-// #[derive(Resource)]
-// struct TowerShootTimer {
-//     // How often to spawn a bullet (repeating timer)
-//     timer: Timer,
-// }
-
-// // Shoot bullets from towers
-// fn tower_shoot(
-//     mut commands: Commands,
-//     time: Res<Time>,
-//     query: Query<&Transform, With<Tower>>,
-//     mut bullet_timer: ResMut<TowerShootTimer>,
-//     textures: Res<TextureAssets>,
-// ) {
-//     bullet_timer.timer.tick(time.delta());
-
-//     if bullet_timer.timer.finished() {
-//         for transform in &mut query.iter() {
-//             commands.spawn((
-//                 SpriteSheetBundle {
-//                     texture_atlas: textures.shmup.clone(),
-//                     sprite: TextureAtlasSprite::new(0),
-//                     transform: Transform::from_xyz(
-//                         transform.translation.x,
-//                         transform.translation.y,
-//                         3.0,
-//                     ),
-//                     ..default()
-//                 },
-//                 Bullet,
-//             ));
-//         }
-//     }
-// }
-
-// // Enable tower shooting
-// fn setup_tower_shooting(mut commands: Commands) {
-//     commands.insert_resource(TowerShootTimer {
-//         timer: Timer::new(Duration::from_secs(3), TimerMode::Repeating),
-//     });
-// }
-
-// // Move bullets
-// fn bullet_movement(
-//     mut commands: Commands,
-//     time: Res<Time>,
-//     mut bullet: Query<(Entity, &mut Transform), With<Bullet>>,
-// ) {
-//     // Despawn Y level
-//     let despawn_y_level = 300.0;
-
-//     for (entity, mut transform) in bullet.iter_mut() {
-//         transform.translation.y += time.delta_seconds() * 30.0;
-
-//         if transform.translation.y > despawn_y_level {
-//             commands.entity(entity).despawn();
-//             info!("Despawn bullet")
-//         }
-//     }
-// }
+            gizmos.line(bottom_left, bottom_right, Color::WHITE);
+            gizmos.line(bottom_right, top_right, Color::WHITE);
+            gizmos.line(top_right, top_left, Color::WHITE);
+            gizmos.line(top_left, bottom_left, Color::WHITE);
+        });
+    }
+}
