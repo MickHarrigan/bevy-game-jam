@@ -14,6 +14,7 @@ impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Visualizer::default())
             .register_type::<Visualizer>()
+            .register_type::<BoidGroup>()
             .add_systems(Update, bevy::window::close_on_esc)
             .add_systems(
                 Update,
@@ -105,4 +106,8 @@ fn spawn_random_boids(
             ));
         });
     }
+}
+
+fn edit_boid_groups(groups: Query<&BoidGroup>) {
+    // this should creat a window with a dropdown of all boidgroups and allow editing of all the values within
 }

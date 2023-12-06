@@ -1,8 +1,9 @@
 use bevy::time::common_conditions::on_timer;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy_inspector_egui::InspectorOptions;
 use quadtree::prelude::*;
 use quadtree::quadtree::tree::QuadTree;
 use rand::Rng;
-use std::f32::consts::PI;
 use std::time::Duration;
 
 use crate::boids::{create_boid_group, move_system};
@@ -80,16 +81,36 @@ impl Velocity {
 pub struct Bee;
 
 // Seperate out these types of data???
-#[derive(Component)]
+#[derive(Component, Reflect, InspectorOptions)]
+#[reflect(Component, InspectorOptions)]
+#[reflect(from_reflect = false)]
 pub struct BoidGroup {
+    #[reflect(ignore)]
     pub graph: quadtree::prelude::tree::QuadTree<Body>,
     pub id: u32,
     pub count: u32,
+    #[inspector(min = 0.0, max = 1.0)]
     pub separation: f32,
+    #[inspector(min = 0.0, max = 1.0)]
     pub alignment: f32,
+    #[inspector(min = 0.0, max = 1.0)]
     pub cohesion: f32,
+    #[inspector(min = 0.0, max = 200.0)]
     pub speed: f32,
+    #[inspector(min = 0.0, max = 1000.0)]
     pub vision: f32,
+}
+
+impl Default for BoidGroup {
+    fn default() -> Self {
+        Self {
+            graph: QuadTree::new(region::Region::new(
+                coord::Coord { x: 0, y: 0 },
+                coord::Coord { x: 0, y: 0 },
+            )),
+            ..default()
+        }
+    }
 }
 
 impl BoidGroup {
@@ -156,7 +177,7 @@ fn place_bee(
     textures: Res<TextureAssets>,
     mouse_input: Res<Input<MouseButton>>,
 ) {
-    if mouse_input.just_pressed(MouseButton::Left) {
+    if mouse_input.just_pressed(MouseButton::Right) {
         commands.spawn((
             SpriteSheetBundle {
                 texture_atlas: textures.planes.clone(),
