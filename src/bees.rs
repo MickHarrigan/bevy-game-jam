@@ -13,25 +13,21 @@ use crate::{
     loading::TextureAssets,
     GameState,
 };
+use crate::interactions::MousePosition;
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
-// use bevy_pancam::PanCam;
+// use bevy::window::PrimaryWindow;
 
 pub struct BeesPlugin;
 
 impl Plugin for BeesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), setup)
+        app
+            .add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(
                 Update,
                 create_boid_group.run_if(in_state(GameState::Playing)),
             )
-            .add_systems(Update, update_cursor.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
-            .add_systems(
-                Update,
-                show_mouse_location.run_if(in_state(GameState::Playing)),
-            )
             .add_systems(
                 Update,
                 (build_or_update_quadtree, update_boids, move_system).run_if(
@@ -93,8 +89,6 @@ struct Destination {
     world_pos: Vec2,
 }
 
-// Separate out these types of data???
-#[derive(Component)]
 // Seperate out these types of data???
 #[derive(Component, Reflect, InspectorOptions)]
 #[reflect(Component, InspectorOptions)]
@@ -155,37 +149,17 @@ pub struct Body {
     pub velocity: Vec3,
 }
 
-#[derive(Resource)]
-struct MousePosition {
-    position: Vec2,
-}
+
 
 fn setup(mut commands: Commands) {
     // commands.insert_resource(BeeSpawner {
     //     timer: Timer::new(Duration::from_secs(2), TimerMode::Repeating),
     // });
-    commands.insert_resource(MousePosition {
-        position: Vec2::new(0.0, 0.0),
-    });
+    // commands.insert_resource(MousePosition {
+    //     position: Vec2::new(0.0, 0.0),
+    // });
 }
 
-// Update mouse position
-fn update_cursor(
-    q_cam: Query<(&Camera, &GlobalTransform)>,
-    q_window: Query<&Window, With<PrimaryWindow>>,
-    mut mouse_position: ResMut<MousePosition>,
-) {
-    let (camera, camera_transform) = q_cam.single();
-    let window = q_window.single();
-
-    if let Some(world_pos) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
-        // .map(|ray| ray.origin.truncate())
-    {
-        mouse_position.position = world_pos;
-    }
-}
 
 fn place_bee(
     mut commands: Commands,
@@ -212,9 +186,4 @@ fn place_bee(
         ));
         info!("Bee spawned");
     }
-}
-
-fn show_mouse_location(mut gizmos: Gizmos, mouse_position: Res<MousePosition>) {
-    gizmos.ray_2d(mouse_position.position, Vec2::new(1., 0.), Color::GREEN);
-    gizmos.ray_2d(mouse_position.position, Vec2::new(0., 1.), Color::RED);
 }

@@ -20,6 +20,7 @@ mod bees;
 mod boids;
 mod debug;
 mod world;
+mod interactions;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -38,6 +39,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 #[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use crate::interactions::InteractionsPlugin;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -67,6 +69,7 @@ impl Plugin for GamePlugin {
             // PlayerPlugin,
             CameraPlugin,
             WorldPlugin,
+            InteractionsPlugin,
             BeesPlugin,
         ));
 
