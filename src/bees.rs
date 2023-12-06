@@ -77,7 +77,20 @@ impl Velocity {
 #[derive(Component)]
 struct Bee;
 
-// Seperate out these types of data???
+#[derive(Component)]
+enum Behavior {
+    Traveling,
+    Wondering,
+    Exploring,
+    Interacting,
+}
+
+#[derive(Component)]
+struct Destination {
+    world_pos: Vec2,
+}
+
+// Separate out these types of data???
 #[derive(Component)]
 pub struct BoidGroup {
     pub graph: quadtree::prelude::tree::QuadTree<Body>,
@@ -176,20 +189,20 @@ fn place_bee(
 }
 
 // Move bees according to velocity
-fn move_bee(
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Collider), With<Bee>>,
-    time: Res<Time>,
-) {
-    // let speed = 25.0;
-    for (mut transform, velocity, collider) in query.iter_mut() {
-        transform.translation.x += velocity.0.x * time.delta_seconds();
-        transform.translation.y += velocity.0.y * time.delta_seconds();
-
-        transform.rotation = Quat::from_rotation_arc(Vec3::Y, velocity.0.normalize());
-
-        // Print all bee collisions
-    }
-}
+// fn move_bee(
+//     mut query: Query<(&mut Transform, &mut Velocity, &mut Collider), With<Bee>>,
+//     time: Res<Time>,
+// ) {
+//     // let speed = 25.0;
+//     for (mut transform, velocity, collider) in query.iter_mut() {
+//         transform.translation.x += velocity.0.x * time.delta_seconds();
+//         transform.translation.y += velocity.0.y * time.delta_seconds();
+//
+//         transform.rotation = Quat::from_rotation_arc(Vec3::Y, velocity.0.normalize());
+//
+//         // Print all bee collisions
+//     }
+// }
 
 fn show_mouse_location(mut gizmos: Gizmos, mouse_position: Res<MousePosition>) {
     gizmos.ray_2d(mouse_position.position, Vec2::new(1., 0.), Color::GREEN);

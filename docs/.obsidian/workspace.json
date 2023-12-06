@@ -13,8 +13,8 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Todos.md",
-                "mode": "source",
+                "file": "Gameplay.md",
+                "mode": "preview",
                 "source": false
               }
             }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Todos.md",
+                "file": "Gameplay.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Todos.md",
+                "file": "Gameplay.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Todos.md"
+                "file": "Gameplay.md"
               }
             }
           }
@@ -148,8 +148,8 @@
   },
   "active": "09a660b2d2a74b3d",
   "lastOpenFiles": [
+    "Todos.md",
     "Gameplay.md",
-    "Level 1.md",
-    "Todos.md"
+    "Level 1.md"
   ]
 }
