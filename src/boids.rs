@@ -50,7 +50,7 @@ pub fn update_boids(
             // -------------------- collision query --------------------
             let query_region = collider
                 .into_region(transform.translation)
-                .with_margin((universe.vision * 10.0) as i32);
+                .with_margin((universe.vision) as i32);
             let exclude = match &collider.id {
                 Some(id) => vec![id.clone()],
                 None => vec![],
@@ -91,17 +91,14 @@ pub fn update_boids(
             let mut new_velocity = direction.normalize() * velocity.0.length();
 
             // -------------------- World Border --------------------
+            // this barely works, but it does work
             let margin: i32 = 20;
-            // if (x < win.min.x + margin && velocity.value.x < 0.0)
-            //     || (x > win.max.x - margin && velocity.value.x > 0.0)
-            // {
-            //     new_velocity.x *= -1.0;
-            // }
-            // if (y < win.min.y + margin && velocity.value.y < 0.0)
-            //     || (y > win.max.y - margin && velocity.value.y > 0.0)
-            // {
-            //     new_velocity.y *= -1.0;
-            // }
+            if (x < 0 + margin && velocity.0.x < 0.0) || (x > 3840 - margin && velocity.0.x > 0.0) {
+                new_velocity.x *= -1.0;
+            }
+            if (y < 0 + margin && velocity.0.y < 0.0) || (y > 2160 - margin && velocity.0.y > 0.0) {
+                new_velocity.y *= -1.0;
+            }
 
             // finally set the new velocity
             velocity.0 = new_velocity;
@@ -119,8 +116,7 @@ pub fn move_system(
     };
     query.par_iter_mut().for_each(|(mut transform, velocity)| {
         let direction = velocity.0.normalize();
-        let rotation =
-            Quat::from_rotation_z(-direction.x.atan2(direction.y) + std::f32::consts::PI / 2.0);
+        let rotation = Quat::from_rotation_z(-direction.x.atan2(direction.y));
         transform.rotation = rotation;
 
         transform.translation += velocity.0 * time.delta_seconds() * universe.speed;
