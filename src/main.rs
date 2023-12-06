@@ -33,7 +33,7 @@ fn main() {
         )
         .add_plugins(GamePlugin)
         // Enable / Disable window icon for mac compilation
-        // .add_systems(Startup, set_window_icon)
+        .add_systems(Startup, set_window_icon)
         .run();
 }
 
