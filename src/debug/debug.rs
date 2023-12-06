@@ -1,6 +1,12 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::{math, prelude::*};
+use rand::Rng;
 
-use crate::{bees::BoidGroup, boids::Boid, GameState};
+use crate::{
+    bees::{Bee, BoidGroup, Collider, Velocity},
+    boids::Boid,
+    loading::TextureAssets,
+    GameState,
+};
 
 pub struct DebugPlugin;
 
@@ -8,9 +14,15 @@ impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Visualizer::default())
             .register_type::<Visualizer>()
+            .add_systems(Update, bevy::window::close_on_esc)
             .add_systems(
                 Update,
-                (visualize_quadtree, visualize_boid_sight).run_if(in_state(GameState::Playing)),
+                (
+                    visualize_quadtree,
+                    visualize_boid_radius,
+                    spawn_random_boids,
+                )
+                    .run_if(in_state(GameState::Playing)),
             );
     }
 }
@@ -20,6 +32,7 @@ impl Plugin for DebugPlugin {
 pub struct Visualizer {
     pub quadtree: bool,
     pub boid_vision: bool,
+    pub boid_cone: bool,
 }
 
 pub fn visualize_quadtree(mut gizmos: Gizmos, vis: Res<Visualizer>, groups: Query<&BoidGroup>) {
@@ -44,7 +57,7 @@ pub fn visualize_quadtree(mut gizmos: Gizmos, vis: Res<Visualizer>, groups: Quer
     }
 }
 
-pub fn visualize_boid_sight(
+pub fn visualize_boid_radius(
     boids: Query<&Transform, With<Boid>>,
     groups: Query<&BoidGroup>,
     // mut comms: Commands,
@@ -62,11 +75,34 @@ pub fn visualize_boid_sight(
     };
     for transform in &boids {
         gizmos.circle_2d(transform.translation.xy(), group.vision, Color::PURPLE);
-        // comms.spawn(MaterialMesh2dBundle {
-        //     mesh: meshes.add(shape::Circle::new(group.vision).into()).into(),
-        //     material: mats.add(ColorMaterial::from(Color::PURPLE).into()).into(),
-        //     transform: *transform,
-        //     ..default()
-        // });
+    }
+}
+
+fn spawn_random_boids(
+    mut commands: Commands,
+    input: Res<Input<KeyCode>>,
+    textures: Res<TextureAssets>,
+) {
+    // spawn in 1000 boids randomly in the field on press of some key
+    if input.just_pressed(KeyCode::Space) {
+        (0..1000).for_each(|_| {
+            let mut rng = rand::thread_rng();
+            commands.spawn((
+                SpriteSheetBundle {
+                    texture_atlas: textures.planes.clone(),
+                    sprite: TextureAtlasSprite::new(11),
+                    transform: Transform::from_xyz(
+                        rng.gen_range(20.0..3820.0),
+                        rng.gen_range(20.0..2140.0),
+                        5.0,
+                    ),
+                    ..default()
+                },
+                Bee,
+                Boid,
+                Collider::new(5.0),
+                Velocity::default(),
+            ));
+        });
     }
 }

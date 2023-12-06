@@ -2,6 +2,7 @@ use bevy::time::common_conditions::on_timer;
 use quadtree::prelude::*;
 use quadtree::quadtree::tree::QuadTree;
 use rand::Rng;
+use std::f32::consts::PI;
 use std::time::Duration;
 
 use crate::boids::{create_boid_group, move_system};
@@ -26,16 +27,17 @@ impl Plugin for BeesPlugin {
             )
             .add_systems(Update, update_cursor.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
-            .add_systems(Update, update_boids.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
                 show_mouse_location.run_if(in_state(GameState::Playing)),
             )
             .add_systems(
                 Update,
-                build_or_update_quadtree.run_if(on_timer(Duration::from_secs_f32(1. / 90.))),
-            )
-            .add_systems(Update, move_system.run_if(in_state(GameState::Playing)));
+                (build_or_update_quadtree, update_boids, move_system).run_if(
+                    in_state(GameState::Playing)
+                        .and_then(on_timer(Duration::from_secs_f32(1. / 90.))),
+                ),
+            );
     }
 }
 
@@ -75,7 +77,7 @@ impl Velocity {
 }
 
 #[derive(Component)]
-struct Bee;
+pub struct Bee;
 
 // Seperate out these types of data???
 #[derive(Component)]
@@ -98,11 +100,11 @@ impl BoidGroup {
             graph: QuadTree::new(region::Region::new(min, max)),
             id: team.0,
             count: 0,
-            separation: 0.1,
+            separation: 0.3,
             alignment: 0.4,
-            cohesion: 0.5,
-            speed: 20.0,
-            vision: 10.0,
+            cohesion: 0.8,
+            speed: 40.0,
+            vision: 50.0,
         }
     }
 }

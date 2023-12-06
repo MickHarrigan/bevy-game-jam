@@ -63,12 +63,12 @@ impl Plugin for GamePlugin {
             // PlayerPlugin,
             WorldPlugin,
             BeesPlugin,
-            DebugPlugin,
         ));
 
         #[cfg(debug_assertions)]
         {
             app.add_plugins((
+                DebugPlugin,
                 FrameTimeDiagnosticsPlugin,
                 LogDiagnosticsPlugin::default(),
                 WorldInspectorPlugin::new(),
