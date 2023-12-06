@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
+use bevy::window::{PrimaryWindow, WindowMode};
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
 use bevy_game::GamePlugin; // ToDo: Replace bevy_game with your new crate name.
@@ -24,6 +24,7 @@ fn main() {
                         fit_canvas_to_parent: true,
                         // Tells wasm not to override default event handling, like F5 and Ctrl+R
                         prevent_default_event_handling: false,
+                        mode: WindowMode::BorderlessFullscreen,
                         ..default()
                     }),
                     ..default()

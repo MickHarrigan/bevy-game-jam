@@ -1,4 +1,6 @@
 use bevy::time::common_conditions::on_timer;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy_inspector_egui::InspectorOptions;
 use quadtree::prelude::*;
 use quadtree::quadtree::tree::QuadTree;
 use rand::Rng;
@@ -26,16 +28,17 @@ impl Plugin for BeesPlugin {
             )
             .add_systems(Update, update_cursor.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
-            .add_systems(Update, update_boids.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
                 show_mouse_location.run_if(in_state(GameState::Playing)),
             )
             .add_systems(
                 Update,
-                build_or_update_quadtree.run_if(on_timer(Duration::from_secs_f32(1. / 90.))),
-            )
-            .add_systems(Update, move_system.run_if(in_state(GameState::Playing)));
+                (build_or_update_quadtree, update_boids, move_system).run_if(
+                    in_state(GameState::Playing)
+                        .and_then(on_timer(Duration::from_secs_f32(1. / 90.))),
+                ),
+            );
     }
 }
 
@@ -75,7 +78,7 @@ impl Velocity {
 }
 
 #[derive(Component)]
-struct Bee;
+pub struct Bee;
 
 #[derive(Component)]
 enum Behavior {
@@ -92,15 +95,37 @@ struct Destination {
 
 // Separate out these types of data???
 #[derive(Component)]
+// Seperate out these types of data???
+#[derive(Component, Reflect, InspectorOptions)]
+#[reflect(Component, InspectorOptions)]
+#[reflect(from_reflect = false)]
 pub struct BoidGroup {
+    #[reflect(ignore)]
     pub graph: quadtree::prelude::tree::QuadTree<Body>,
     pub id: u32,
     pub count: u32,
+    #[inspector(min = 0.0, max = 1.0)]
     pub separation: f32,
+    #[inspector(min = 0.0, max = 1.0)]
     pub alignment: f32,
+    #[inspector(min = 0.0, max = 1.0)]
     pub cohesion: f32,
+    #[inspector(min = 0.0, max = 200.0)]
     pub speed: f32,
+    #[inspector(min = 0.0, max = 1000.0)]
     pub vision: f32,
+}
+
+impl Default for BoidGroup {
+    fn default() -> Self {
+        Self {
+            graph: QuadTree::new(region::Region::new(
+                coord::Coord { x: 0, y: 0 },
+                coord::Coord { x: 0, y: 0 },
+            )),
+            ..default()
+        }
+    }
 }
 
 impl BoidGroup {
@@ -111,11 +136,11 @@ impl BoidGroup {
             graph: QuadTree::new(region::Region::new(min, max)),
             id: team.0,
             count: 0,
-            separation: 0.1,
+            separation: 0.3,
             alignment: 0.4,
-            cohesion: 0.5,
-            speed: 20.0,
-            vision: 1.0,
+            cohesion: 0.8,
+            speed: 40.0,
+            vision: 50.0,
         }
     }
 }
@@ -168,7 +193,7 @@ fn place_bee(
     textures: Res<TextureAssets>,
     mouse_input: Res<Input<MouseButton>>,
 ) {
-    if mouse_input.just_pressed(MouseButton::Left) {
+    if mouse_input.just_pressed(MouseButton::Right) {
         commands.spawn((
             SpriteSheetBundle {
                 texture_atlas: textures.planes.clone(),
