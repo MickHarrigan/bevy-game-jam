@@ -17,10 +17,12 @@ mod player;
 
 mod bees;
 mod boids;
+mod debug;
 mod world;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
+use crate::debug::debug::DebugPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
@@ -61,6 +63,7 @@ impl Plugin for GamePlugin {
             // PlayerPlugin,
             WorldPlugin,
             BeesPlugin,
+            DebugPlugin,
         ));
 
         #[cfg(debug_assertions)]

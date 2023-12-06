@@ -50,7 +50,7 @@ pub fn update_boids(
             // -------------------- collision query --------------------
             let query_region = collider
                 .into_region(transform.translation)
-                .with_margin((universe.vision * 10.0) as i32);
+                .with_margin((universe.vision) as i32);
             let exclude = match &collider.id {
                 Some(id) => vec![id.clone()],
                 None => vec![],

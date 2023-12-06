@@ -102,7 +102,7 @@ impl BoidGroup {
             alignment: 0.4,
             cohesion: 0.5,
             speed: 20.0,
-            vision: 1.0,
+            vision: 10.0,
         }
     }
 }

@@ -1,18 +1,9 @@
-use std::time::Duration;
-
-use crate::bees::BoidGroup;
 use crate::GameState;
-use bevy::asset::LoadState;
 use bevy::prelude::*;
-use bevy::render::render_resource::AsBindGroupShaderType;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 use bevy_pancam::PanCam;
 
-use crate::loading::TextureAssets;
 use crate::menu::NextLevel;
-
-// use bevy_pancam::{PanCam, PanCamPlugin};
 
 pub struct WorldPlugin;
 
@@ -25,14 +16,8 @@ impl Plugin for WorldPlugin {
             // LDtk level selection resource
             .insert_resource(LevelSelection::index(0))
             .init_resource::<LdtkLevel>()
-            .insert_resource(QuadTreeVisualizer(false))
-            .register_type::<QuadTreeVisualizer>()
             .add_systems(OnEnter(GameState::Playing), setup_level)
             .add_systems(Update, get_level_data.run_if(in_state(GameState::Playing)))
-            .add_systems(
-                Update,
-                visualize_quadtree.run_if(in_state(GameState::Playing)),
-            )
             // .add_systems(OnExit(GameState::Playing), cleanup_world)
             .add_plugins(LdtkPlugin)
             // .add_plugins(PanCamPlugin::default());
@@ -99,12 +84,6 @@ fn get_level_data(
     }
 }
 
-// fn cleanup_world(mut commands: Commands, world: Query<LdtkProject>) {
-//     for entity in &mut world.iter() {
-//         commands.entity(entity).despawn_recursive();
-//     }
-// }
-
 #[derive(Default, Component)]
 pub struct Queen;
 // Spawning sprites for LDtk entities
@@ -119,30 +98,4 @@ struct QueenBundle {
 struct EnemyQueenBundle {
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: SpriteSheetBundle,
-}
-
-#[derive(Resource, Reflect, Default)]
-#[reflect(Resource)]
-struct QuadTreeVisualizer(pub bool);
-
-fn visualize_quadtree(mut gizmos: Gizmos, vis: Res<QuadTreeVisualizer>, groups: Query<&BoidGroup>) {
-    if !vis.0 {
-        return;
-    }
-    for group in groups.iter() {
-        let regions = group.graph.get_regions();
-        regions.iter().for_each(|reg| {
-            let (min_x, min_y, max_x, max_y) = reg.into_f32();
-
-            let bottom_left = Vec3::new(min_x, min_y, 0.0);
-            let bottom_right = Vec3::new(max_x, min_y, 0.0);
-            let top_right = Vec3::new(max_x, max_y, 0.0);
-            let top_left = Vec3::new(min_x, max_y, 0.0);
-
-            gizmos.line(bottom_left, bottom_right, Color::WHITE);
-            gizmos.line(bottom_right, top_right, Color::WHITE);
-            gizmos.line(top_right, top_left, Color::WHITE);
-            gizmos.line(top_left, bottom_left, Color::WHITE);
-        });
-    }
 }
