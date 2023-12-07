@@ -28,6 +28,7 @@ impl Plugin for BeesPlugin {
             )
             .add_systems(Update, update_cursor.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
+            .add_systems(Update, bloom.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
                 show_mouse_location.run_if(in_state(GameState::Playing)),
@@ -99,6 +100,8 @@ pub struct BoidGroup {
     pub speed: f32,
     #[inspector(min = 0.0, max = 1000.0)]
     pub vision: f32,
+    #[inspector(min = 0.0, max = 1000.0)]
+    pub protected_range: f32,
 }
 
 impl Default for BoidGroup {
@@ -121,11 +124,12 @@ impl BoidGroup {
             graph: QuadTree::new(region::Region::new(min, max)),
             id: team.0,
             count: 0,
-            separation: 0.3,
+            separation: 0.02,
             alignment: 0.4,
             cohesion: 0.8,
             speed: 40.0,
             vision: 50.0,
+            protected_range: 20.0,
         }
     }
 }
@@ -166,7 +170,7 @@ fn update_cursor(
     if let Some(world_pos) = window
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
-        // .map(|ray| ray.origin.truncate())
+    // .map(|ray| ray.origin.truncate())
     {
         mouse_position.position = world_pos;
     }
@@ -202,4 +206,13 @@ fn place_bee(
 fn show_mouse_location(mut gizmos: Gizmos, mouse_position: Res<MousePosition>) {
     gizmos.ray_2d(mouse_position.position, Vec2::new(1., 0.), Color::GREEN);
     gizmos.ray_2d(mouse_position.position, Vec2::new(0., 1.), Color::RED);
+}
+
+fn bloom(mut query: Query<&mut TextureAtlasSprite>, input: Res<Input<KeyCode>>) {
+    for mut bee in query.iter_mut() {
+        if input.just_pressed(KeyCode::B) {
+            let col = bee.color.as_hsla();
+            bee.color = Color::hsla(col.h(), col.s(), col.l() * 4., col.a());
+        }
+    }
 }
