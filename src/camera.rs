@@ -19,7 +19,6 @@ impl Plugin for CameraPlugin {
 fn setup_camera_controls(
     mut q_camera: Query<&mut OrthographicProjection, With<Camera2d>>,
 ) {
-    info!("Setting up camera plugin");
     let mut projection = q_camera.single_mut();
     projection.scale = 0.6;
 }

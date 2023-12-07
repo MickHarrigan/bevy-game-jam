@@ -1,6 +1,6 @@
-use bevy::input::mouse::MouseMotion;
-use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy::prelude::*;
+use crate::bees::Bee;
 use crate::GameState;
 
 pub struct InteractionsPlugin;
@@ -40,7 +40,12 @@ struct MouseState(MouseStates);
 pub struct Highlightable;
 
 #[derive(Component)]
-pub struct Selectable;
+struct Highlighted {
+    list: Vec<Entity>
+}
+
+#[derive(Component)]
+pub struct Clickable;
 
 // Systems
 fn update_mouse_position(
@@ -65,10 +70,10 @@ fn show_mouse_location(mut gizmos: Gizmos, mouse_position: Res<MousePosition>) {
 }
 
 fn mouse_state_manager(
-    commands: Commands,
     buttons: Res<Input<MouseButton>>,
     mut mouse_state: ResMut<MouseState>,
-    mouse_position: Res<MousePosition>
+    mouse_position: Res<MousePosition>,
+    mut q_bees: Query<(Entity, &Transform), With<Bee>>,
 ) {
     for button in buttons.get_just_pressed() {
         info!("{:?} is currently held down", button);
@@ -82,6 +87,27 @@ fn mouse_state_manager(
     }
     for button in buttons.get_just_released() {
         info!("{:?} has been released", button);
+        match button {
+            // Checking for all bee entities inside square mouse region on mouse up event
+            MouseButton::Left => {
+                if let MouseStates::LeftDragging(start_pos) = mouse_state.0 {
+                    let min_x = start_pos.x.min(mouse_position.0.x);
+                    let max_x = start_pos.x.max(mouse_position.0.x);
+                    let min_y = start_pos.y.min(mouse_position.0.y);
+                    let max_y = start_pos.y.max(mouse_position.0.y);
+
+                    for (entity, transform) in q_bees.iter_mut() {
+                        let bee_pos = transform.translation;
+                        if bee_pos.x >= min_x && bee_pos.x <= max_x &&
+                            bee_pos.y >= min_y && bee_pos.y <= max_y {
+                            info!("Bee entity {:?} is inside the mouse square region.", entity);
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+
         mouse_state.0 = MouseStates::Default;
     }
 }

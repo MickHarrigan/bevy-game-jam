@@ -7,6 +7,7 @@ use crate::{
     loading::TextureAssets,
     GameState,
 };
+use crate::interactions::Highlightable;
 
 pub struct DebugPlugin;
 
@@ -101,6 +102,7 @@ fn spawn_random_boids(
                 },
                 Bee,
                 Boid,
+                Highlightable,
                 Collider::new(5.0),
                 Velocity::default(),
             ));

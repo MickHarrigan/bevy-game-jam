@@ -13,7 +13,8 @@ use crate::{
     loading::TextureAssets,
     GameState,
 };
-use crate::interactions::MousePosition;
+
+use crate::interactions::{MousePosition, Highlightable};
 use bevy::prelude::*;
 // use bevy::window::PrimaryWindow;
 
@@ -151,7 +152,7 @@ pub struct Body {
 
 
 
-fn setup(mut commands: Commands) {
+fn setup(mut _commands: Commands) {
     // commands.insert_resource(BeeSpawner {
     //     timer: Timer::new(Duration::from_secs(2), TimerMode::Repeating),
     // });
@@ -181,6 +182,7 @@ fn place_bee(
             },
             Bee,
             Boid,
+            Highlightable,
             Collider::new(5.0),
             Velocity::default(),
         ));
