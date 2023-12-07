@@ -173,8 +173,8 @@ fn place_bee(
                 texture_atlas: textures.planes.clone(),
                 sprite: TextureAtlasSprite::new(11),
                 transform: Transform::from_xyz(
-                    mouse_position.position.x,
-                    mouse_position.position.y,
+                    mouse_position.0.x,
+                    mouse_position.0.y,
                     5.0,
                 ),
                 ..default()
