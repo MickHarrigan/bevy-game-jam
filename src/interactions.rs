@@ -1,7 +1,8 @@
 use bevy::window::PrimaryWindow;
 use bevy::prelude::*;
-use crate::bees::Bee;
 use crate::GameState;
+
+use std::collections::HashSet;
 
 pub struct InteractionsPlugin;
 
@@ -12,7 +13,7 @@ impl Plugin for InteractionsPlugin {
             .add_systems(Update, update_mouse_position.run_if(in_state(GameState::Playing)))
             .add_systems(Update, show_mouse_location.run_if(in_state(GameState::Playing)))
             .insert_resource(MouseState(MouseStates::Default))
-            .insert_resource(HighlightedEntities(Vec::new()))
+            .insert_resource(HighlightedEntities(HashSet::new()))
             .add_systems(Update, mouse_state_manager.run_if(in_state(GameState::Playing)))
             .add_systems(Update, draw_mouse_region.run_if(in_state(GameState::Playing)))
             .add_systems(Update, bloom_highlighted_entities.run_if(in_state(GameState::Playing)))
@@ -45,7 +46,7 @@ pub struct Highlightable;
 #[derive(Component)]
 pub struct Highlighted;
 #[derive(Resource, Debug)]
-struct HighlightedEntities(Vec<Entity>);
+struct HighlightedEntities(HashSet<Entity>);
 
 #[derive(Component)]
 pub struct Clickable;
@@ -78,13 +79,17 @@ fn mouse_state_manager(
     mut mouse_state: ResMut<MouseState>,
     mouse_position: Res<MousePosition>,
     mut highlighted_entities: ResMut<HighlightedEntities>,
-    mut q_bees: Query<(Entity, &Transform, Option<&Highlighted>), With<Bee>>,
+    mut q_entities: Query<(Entity, &Transform, Option<&Highlighted>), With<Highlightable>>,
 ) {
     for button in buttons.get_just_pressed() {
         info!("{:?} is currently held down", button);
         // mouse_state.0 = MouseStates::MouseDown;
         match button {
-            MouseButton::Left => mouse_state.0 = MouseStates::LeftDragging(mouse_position.0),
+            MouseButton::Left => {
+                mouse_state.0 = { MouseStates::LeftDragging(mouse_position.0) };
+                // TODO: Do something with the highlighted entities with an event at this point
+                highlighted_entities.0.clear();
+            },
             MouseButton::Right => mouse_state.0 = MouseStates::RightDragging(mouse_position.0),
             MouseButton::Middle => mouse_state.0 = MouseStates::MiddleDragging(mouse_position.0),
             _ => {}
@@ -93,34 +98,30 @@ fn mouse_state_manager(
     for button in buttons.get_just_released() {
         info!("{:?} has been released", button);
         match button {
-            // Mouse left just release must add bees to highlighted resource if empty, and direct them if already highlighted
+            // On mouse left just released
             MouseButton::Left => {
+                // If it was previously in the dragging state
                 if let MouseStates::LeftDragging(start_pos) = mouse_state.0 {
-                    if highlighted_entities.0.is_empty() {
-                        // Add bees to highlighted resource
-                        let min_x = start_pos.x.min(mouse_position.0.x);
-                        let max_x = start_pos.x.max(mouse_position.0.x);
-                        let min_y = start_pos.y.min(mouse_position.0.y);
-                        let max_y = start_pos.y.max(mouse_position.0.y);
+                    // Grab the mouse dragged square region
+                    let min_x = start_pos.x.min(mouse_position.0.x);
+                    let max_x = start_pos.x.max(mouse_position.0.x);
+                    let min_y = start_pos.y.min(mouse_position.0.y);
+                    let max_y = start_pos.y.max(mouse_position.0.y);
+                    // For all entities with
+                    for (entity, transform, highlighted) in q_entities.iter_mut() {
+                        let entity_pos = transform.translation;
+                        // Check if their transform is in the square region
+                        if entity_pos.x >= min_x && entity_pos.x <= max_x &&
+                            entity_pos.y >= min_y && entity_pos.y <= max_y {
+                            info!("Entity {:?} is inside the mouse square region.", entity);
+                            // Add them to the highlighted entities hashmap
+                            highlighted_entities.0.insert(entity);
 
-                        for (entity, transform, highlighted) in q_bees.iter_mut() {
-                            let bee_pos = transform.translation;
-                            if bee_pos.x >= min_x && bee_pos.x <= max_x &&
-                                bee_pos.y >= min_y && bee_pos.y <= max_y {
-                                info!("Bee entity {:?} is inside the mouse square region and highlighted.", entity);
-                                highlighted_entities.0.push(entity);
-                                if let None = highlighted {
-                                    commands.entity(entity).insert(Highlighted);
-                                }
+                            if let None = highlighted {
+                                commands.entity(entity).insert(Highlighted);
                             }
-                        }
-                    }
-                    else {
-                        // Change the bee's destination world coordinates
-                        info!("Emptying the highlight list full of {:?}", highlighted_entities.0);
-                        highlighted_entities.0.clear();
-                        for (entity, _transform, highlighted) in q_bees.iter_mut() {
-                            if let Some(_highlighted) = highlighted {
+                        } else {
+                            if let Some(_) = highlighted {
                                 commands.entity(entity).remove::<Highlighted>();
                             }
                         }
@@ -129,7 +130,6 @@ fn mouse_state_manager(
             }
             _ => {}
         }
-
         mouse_state.0 = MouseStates::Default;
     }
 }
@@ -163,7 +163,7 @@ fn bloom_highlighted_entities
 ) {
     for mut texture in q_highlighted.iter_mut() {
         let col = texture.color.as_hsla();
-        texture.color = Color::hsla(col.h(), col.s(), col.l() * 2., col.a());
+        texture.color = Color::hsla(col.h(), col.s(), col.l() * 1.5, col.a());
     }
 }
 
@@ -175,7 +175,7 @@ fn remove_bloom
     for removed_entity in removals.read() {
         if let Ok((_, mut texture)) = q_highlighted.get_mut(removed_entity) {
             let col = texture.color.as_hsla();
-            texture.color = Color::hsla(col.h(), col.s(), col.l() / 2., col.a());
+            texture.color = Color::hsla(col.h(), col.s(), col.l() / 1.5, col.a());
         }
     }
 }
