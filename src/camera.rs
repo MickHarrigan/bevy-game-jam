@@ -84,7 +84,7 @@ fn zooming_controls
 
         let zoom_amount = match ev.unit {
             MouseScrollUnit::Line => ev.y * zoom_speed,
-            MouseScrollUnit::Pixel => ev.y * zoom_speed,
+            MouseScrollUnit::Pixel => ev.y * zoom_speed / 8.0,
         };
 
         projection.scale -= zoom_amount;
