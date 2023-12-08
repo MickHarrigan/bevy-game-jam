@@ -12,8 +12,11 @@ impl Plugin for InteractionsPlugin {
             .add_systems(Update, update_mouse_position.run_if(in_state(GameState::Playing)))
             .add_systems(Update, show_mouse_location.run_if(in_state(GameState::Playing)))
             .insert_resource(MouseState(MouseStates::Default))
+            .insert_resource(HighlightedEntities(Vec::new()))
             .add_systems(Update, mouse_state_manager.run_if(in_state(GameState::Playing)))
             .add_systems(Update, draw_mouse_region.run_if(in_state(GameState::Playing)))
+            .add_systems(Update, bloom_highlighted_entities.run_if(in_state(GameState::Playing)))
+            .add_systems(Update, remove_bloom.run_if(in_state(GameState::Playing)))
         ;
     }
 }
@@ -40,9 +43,9 @@ struct MouseState(MouseStates);
 pub struct Highlightable;
 
 #[derive(Component)]
-struct Highlighted {
-    list: Vec<Entity>
-}
+pub struct Highlighted;
+#[derive(Resource, Debug)]
+struct HighlightedEntities(Vec<Entity>);
 
 #[derive(Component)]
 pub struct Clickable;
@@ -70,10 +73,12 @@ fn show_mouse_location(mut gizmos: Gizmos, mouse_position: Res<MousePosition>) {
 }
 
 fn mouse_state_manager(
+    mut commands: Commands,
     buttons: Res<Input<MouseButton>>,
     mut mouse_state: ResMut<MouseState>,
     mouse_position: Res<MousePosition>,
-    mut q_bees: Query<(Entity, &Transform), With<Bee>>,
+    mut highlighted_entities: ResMut<HighlightedEntities>,
+    mut q_bees: Query<(Entity, &Transform, Option<&Highlighted>), With<Bee>>,
 ) {
     for button in buttons.get_just_pressed() {
         info!("{:?} is currently held down", button);
@@ -88,19 +93,36 @@ fn mouse_state_manager(
     for button in buttons.get_just_released() {
         info!("{:?} has been released", button);
         match button {
-            // Checking for all bee entities inside square mouse region on mouse up event
+            // Mouse left just release must add bees to highlighted resource if empty, and direct them if already highlighted
             MouseButton::Left => {
                 if let MouseStates::LeftDragging(start_pos) = mouse_state.0 {
-                    let min_x = start_pos.x.min(mouse_position.0.x);
-                    let max_x = start_pos.x.max(mouse_position.0.x);
-                    let min_y = start_pos.y.min(mouse_position.0.y);
-                    let max_y = start_pos.y.max(mouse_position.0.y);
+                    if highlighted_entities.0.is_empty() {
+                        // Add bees to highlighted resource
+                        let min_x = start_pos.x.min(mouse_position.0.x);
+                        let max_x = start_pos.x.max(mouse_position.0.x);
+                        let min_y = start_pos.y.min(mouse_position.0.y);
+                        let max_y = start_pos.y.max(mouse_position.0.y);
 
-                    for (entity, transform) in q_bees.iter_mut() {
-                        let bee_pos = transform.translation;
-                        if bee_pos.x >= min_x && bee_pos.x <= max_x &&
-                            bee_pos.y >= min_y && bee_pos.y <= max_y {
-                            info!("Bee entity {:?} is inside the mouse square region.", entity);
+                        for (entity, transform, highlighted) in q_bees.iter_mut() {
+                            let bee_pos = transform.translation;
+                            if bee_pos.x >= min_x && bee_pos.x <= max_x &&
+                                bee_pos.y >= min_y && bee_pos.y <= max_y {
+                                info!("Bee entity {:?} is inside the mouse square region and highlighted.", entity);
+                                highlighted_entities.0.push(entity);
+                                if let None = highlighted {
+                                    commands.entity(entity).insert(Highlighted);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        // Change the bee's destination world coordinates
+                        info!("Emptying the highlight list full of {:?}", highlighted_entities.0);
+                        highlighted_entities.0.clear();
+                        for (entity, _transform, highlighted) in q_bees.iter_mut() {
+                            if let Some(_highlighted) = highlighted {
+                                commands.entity(entity).remove::<Highlighted>();
+                            }
                         }
                     }
                 }
@@ -120,7 +142,8 @@ fn draw_mouse_region
 ) {
     match mouse_state.0 {
         MouseStates::LeftDragging(pos) => {
-            gizmos.line_2d(pos, mouse_position.0, Color::RED);
+            // Diagonal debug line
+            // gizmos.line_2d(pos, mouse_position.0, Color::RED);
             // Draw horizontal line
             gizmos.line_2d(pos, Vec2::new(mouse_position.0.x, pos.y), Color::BLUE);
             // Draw vertical line
@@ -131,5 +154,28 @@ fn draw_mouse_region
             gizmos.line_2d(mouse_position.0, Vec2::new(mouse_position.0.x, pos.y), Color::BLUE);
         }
         _ => {}
+    }
+}
+
+fn bloom_highlighted_entities
+(
+    mut q_highlighted: Query<&mut TextureAtlasSprite, Added<Highlighted>>,
+) {
+    for mut texture in q_highlighted.iter_mut() {
+        let col = texture.color.as_hsla();
+        texture.color = Color::hsla(col.h(), col.s(), col.l() * 2., col.a());
+    }
+}
+
+fn remove_bloom
+(
+    mut removals: RemovedComponents<Highlighted>,
+    mut q_highlighted: Query<(Entity, &mut TextureAtlasSprite)>
+) {
+    for removed_entity in removals.read() {
+        if let Ok((_, mut texture)) = q_highlighted.get_mut(removed_entity) {
+            let col = texture.color.as_hsla();
+            texture.color = Color::hsla(col.h(), col.s(), col.l() / 2., col.a());
+        }
     }
 }
