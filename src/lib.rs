@@ -21,6 +21,7 @@ mod boids;
 mod debug;
 mod world;
 mod interactions;
+mod tilemap;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -32,6 +33,7 @@ use crate::player::PlayerPlugin;
 use crate::bees::BeesPlugin;
 use crate::world::WorldPlugin;
 use crate::camera::CameraPlugin;
+use crate::tilemap::MapPlugin;
 
 use bevy::app::App;
 #[cfg(debug_assertions)]
@@ -68,16 +70,17 @@ impl Plugin for GamePlugin {
             // InternalAudioPlugin,
             // PlayerPlugin,
             CameraPlugin,
-            WorldPlugin,
-            InteractionsPlugin,
-            BeesPlugin,
+            MapPlugin,
+            // WorldPlugin,
+            // InteractionsPlugin,
+            // BeesPlugin,
         ));
 
         #[cfg(debug_assertions)]
         {
             app.add_plugins((
                 DebugPlugin,
-                FrameTimeDiagnosticsPlugin,
+                // FrameTimeDiagnosticsPlugin,
                 LogDiagnosticsPlugin::default(),
                 WorldInspectorPlugin::new(),
             ))

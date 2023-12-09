@@ -57,4 +57,6 @@ pub struct TextureAssets {
     ))]
     #[asset(path = "textures/airplanes.png")]
     pub planes: Handle<TextureAtlas>,
+    #[asset(path = "textures/ground/ground.png")]
+    pub ground: Handle<Image>
 }

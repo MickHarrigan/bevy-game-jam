@@ -1,7 +1,7 @@
 use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 use crate::GameState;
-use crate::world::LevelData;
+use crate::tilemap::LevelData;
 
 pub struct CameraPlugin;
 

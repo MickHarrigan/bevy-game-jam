@@ -699,6 +699,7 @@ dependencies = [
  "bevy-inspector-egui",
  "bevy_asset_loader",
  "bevy_ecs_ldtk",
+ "bevy_ecs_tilemap",
  "bevy_kira_audio",
  "embed-resource",
  "image",
