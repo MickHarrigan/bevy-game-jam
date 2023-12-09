@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use crate::loading::TextureAssets;
 
-use rand::Rng;
+use rand::Rng;  
 
 pub struct MapPlugin;
 impl Plugin for MapPlugin {

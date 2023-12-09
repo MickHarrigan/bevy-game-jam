@@ -70,6 +70,7 @@ bevy_ecs_tilemap = { git = "https://github.com/divark/bevy_ecs_tilemap", branch 
 bevy_ecs_ldtk = { git = "https://github.com/Trouv/bevy_ecs_ldtk.git", branch = "feat/bevy-0.12" }
 bevy-inspector-egui = "0.21.0"
 quadtree = { git = "https://github.com/MickHarrigan/quadtree.git" }
+time = "0.3.30"
 
 
 [build-dependencies]

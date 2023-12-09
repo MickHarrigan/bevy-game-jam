@@ -72,8 +72,8 @@ impl Plugin for GamePlugin {
             CameraPlugin,
             MapPlugin,
             // WorldPlugin,
-            // InteractionsPlugin,
-            // BeesPlugin,
+            InteractionsPlugin,
+            BeesPlugin,
         ));
 
         #[cfg(debug_assertions)]

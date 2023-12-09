@@ -1,34 +1,34 @@
 use crate::{
     bees::{Body, Team},
-    world::LdtkLevel,
+    // world::LdtkLevel,
 };
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
+// use bevy_ecs_ldtk::prelude::*;
 
 use crate::bees::{BoidGroup, Collider, Velocity};
+use crate::tilemap::LevelData;
 
 #[derive(Component)]
 pub struct Boid;
 
 pub fn create_boid_group(
     mut comms: Commands,
-    level: Res<Assets<LdtkProject>>,
-    handle: Res<LdtkLevel>,
+    // level: Res<Assets<LdtkProject>>,
+    // handle: Res<LdtkLevel>,
+    level_data: Res<LevelData>,
     mut loaded: Local<bool>,
 ) {
     if *loaded {
         return;
     }
-    if let Some(data) = level.get(&handle.0) {
-        let height = data.iter_root_levels().next().unwrap().px_hei;
-        let width = data.iter_root_levels().next().unwrap().px_wid;
-        comms.spawn(BoidGroup::new(
-            Vec2::new(0., 0.),
-            Vec2::new(width as f32, height as f32),
-            Team(0),
-        ));
-        *loaded = true;
-    }
+    let height = level_data.level_height;
+    let width = level_data.level_width;
+    comms.spawn(BoidGroup::new(
+        Vec2::new(0., 0.),
+        Vec2::new(width, height),
+        Team(0),
+    ));
+    *loaded = true;
 }
 
 pub fn update_boids(

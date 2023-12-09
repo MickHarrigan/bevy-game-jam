@@ -2,6 +2,7 @@ use crate::GameState;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_kira_audio::AudioSource;
+use bevy_asset_loader::asset_collection::AssetCollection;
 
 pub struct LoadingPlugin;
 
@@ -31,8 +32,10 @@ pub struct AudioAssets {
 pub struct TextureAssets {
     #[asset(path = "textures/bevy.png")]
     pub bevy: Handle<Image>,
+
     #[asset(path = "textures/github.png")]
     pub github: Handle<Image>,
+
     #[asset(texture_atlas(
         tile_size_x = 16.,
         tile_size_y = 16.,
@@ -45,6 +48,7 @@ pub struct TextureAssets {
     ))]
     #[asset(path = "textures/shmup.png")]
     pub shmup: Handle<TextureAtlas>,
+
     #[asset(texture_atlas(
         tile_size_x = 32.,
         tile_size_y = 32.,
@@ -57,6 +61,15 @@ pub struct TextureAssets {
     ))]
     #[asset(path = "textures/airplanes.png")]
     pub planes: Handle<TextureAtlas>,
+
+    // #[asset(texture_atlas(tile_size_x = 720., tile_size_y = 720., columns = 4, rows = 1, padding_x = 0., padding_y = 0., offset_x = 0., offset_y = 0.))]
     #[asset(path = "textures/ground/ground.png")]
-    pub ground: Handle<Image>
+    pub ground: Handle<Image>,
+
+    #[asset(texture_atlas(tile_size_x = 720., tile_size_y = 720., columns = 3, rows = 1, padding_x = 0., padding_y = 0., offset_x = 0., offset_y = 0.))]
+    #[asset(path = "textures/bee1/wingmap.png")]
+    pub bee1wingmap: Handle<TextureAtlas>,
+
+    #[asset(path = "textures/bee1/beebody.png")]
+    pub beebody1: Handle<Image>,
 }

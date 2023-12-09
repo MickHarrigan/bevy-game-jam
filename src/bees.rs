@@ -26,6 +26,7 @@ impl Plugin for BeesPlugin {
             .add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(Update, create_boid_group.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
+            .add_systems(Update, animate_wings.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
                 (build_or_update_quadtree, update_boids, move_system).run_if(
@@ -154,6 +155,33 @@ fn setup(mut _commands: Commands) {
     // });
 }
 
+#[derive(Component)]
+struct AnimationIndices {
+    first: usize,
+    last: usize,
+}
+#[derive(Component, Deref, DerefMut)]
+struct AnimationTimer(Timer);
+
+fn animate_wings(
+    time: Res<Time>,
+    mut query: Query<(
+        &AnimationIndices,
+        &mut AnimationTimer,
+        &mut TextureAtlasSprite,
+    )>,
+) {
+    for (indices, mut timer, mut sprite) in &mut query {
+        timer.tick(time.delta());
+        if timer.just_finished() {
+            sprite.index = if sprite.index == indices.last {
+                indices.first
+            } else {
+                sprite.index + 1
+            };
+        }
+    }
+}
 
 fn place_bee(
     mut commands: Commands,
@@ -162,10 +190,9 @@ fn place_bee(
     mouse_input: Res<Input<MouseButton>>,
 ) {
     if mouse_input.just_pressed(MouseButton::Right) {
-        commands.spawn((
-            SpriteSheetBundle {
-                texture_atlas: textures.planes.clone(),
-                sprite: TextureAtlasSprite::new(11),
+        let bee_entity = commands.spawn((
+            SpriteBundle {
+                texture: textures.beebody1.clone(),
                 transform: Transform::from_xyz(
                     mouse_position.0.x,
                     mouse_position.0.y,
@@ -179,7 +206,23 @@ fn place_bee(
             Highlightable,
             Collider::new(5.0),
             Velocity::default(),
-        ));
+        )).id();
+
+        // Create the wings
+        let texture_atlas_handle = textures.bee1wingmap.clone();
+
+        // Spawn the wings as a child of the bee body
+        commands.entity(bee_entity).with_children(|parent| {
+            parent.spawn(SpriteSheetBundle {
+                texture_atlas: textures.bee1wingmap.clone(),
+                sprite: TextureAtlasSprite::new(0), // Set the initial sprite index
+                transform: Transform::from_xyz(0.0, 0.0, 1.0), // Adjust the position of the wings relative to the bee body
+                ..Default::default()
+            })
+                .insert(AnimationIndices { first: 0, last: 3 - 1 })
+                .insert(AnimationTimer(Timer::from_seconds(0.3, TimerMode::Repeating)));
+        });
+
         info!("Bee spawned");
     }
 }
