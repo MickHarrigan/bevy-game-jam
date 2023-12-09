@@ -24,10 +24,7 @@ impl Plugin for BeesPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(GameState::Playing), setup)
-            .add_systems(
-                Update,
-                create_boid_group.run_if(in_state(GameState::Playing)),
-            )
+            .add_systems(Update, create_boid_group.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
@@ -35,7 +32,8 @@ impl Plugin for BeesPlugin {
                     in_state(GameState::Playing)
                         .and_then(on_timer(Duration::from_secs_f32(1. / 90.))),
                 ),
-            );
+            )
+        ;
     }
 }
 
@@ -78,19 +76,14 @@ impl Velocity {
 pub struct Bee;
 
 #[derive(Component)]
-enum Behavior {
-    Traveling,
-    Wondering,
-    Exploring,
-    Interacting,
+pub enum BeeBehavior {
+    Traveling(Vec2), // Destination coordinates
+    Wondering(Vec2), // Point of origin coordinates
+    Exploring(Vec2), // Point of origin coordinates
+    Interacting(Vec2), // Coordinates of interactable object
 }
 
-#[derive(Component)]
-struct Destination {
-    world_pos: Vec2,
-}
-
-// Seperate out these types of data???
+// Separate out these types of data???
 #[derive(Component, Reflect, InspectorOptions)]
 #[reflect(Component, InspectorOptions)]
 #[reflect(from_reflect = false)]
@@ -181,6 +174,7 @@ fn place_bee(
                 ..default()
             },
             Bee,
+            BeeBehavior::Wondering(Vec2::new(mouse_position.0.x, mouse_position.0.y)),
             Boid,
             Highlightable,
             Collider::new(5.0),

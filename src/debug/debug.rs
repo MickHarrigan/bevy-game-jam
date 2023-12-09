@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::Rng;
 
 use crate::{
-    bees::{Bee, BoidGroup, Collider, Velocity},
+    bees::{Bee, BoidGroup, Collider, Velocity, BeeBehavior},
     boids::Boid,
     loading::TextureAssets,
     GameState,
@@ -89,19 +89,22 @@ fn spawn_random_boids(
     if input.just_pressed(KeyCode::Space) {
         (0..1000).for_each(|_| {
             let mut rng = rand::thread_rng();
+            let spawn_x = rng.gen_range(20.0..3820.0);
+            let spawn_y = rng.gen_range(20.0..2140.0);
             commands.spawn((
                 SpriteSheetBundle {
                     texture_atlas: textures.planes.clone(),
                     sprite: TextureAtlasSprite::new(11),
                     transform: Transform::from_xyz(
-                        rng.gen_range(20.0..3820.0),
-                        rng.gen_range(20.0..2140.0),
+                        spawn_x,
+                        spawn_y,
                         5.0,
                     ),
                     ..default()
                 },
                 Bee,
                 Boid,
+                BeeBehavior::Wondering(Vec2::new(spawn_x, spawn_y)),
                 Highlightable,
                 Collider::new(5.0),
                 Velocity::default(),

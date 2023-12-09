@@ -113,7 +113,7 @@ fn mouse_state_manager(
                         // Check if their transform is in the square region
                         if entity_pos.x >= min_x && entity_pos.x <= max_x &&
                             entity_pos.y >= min_y && entity_pos.y <= max_y {
-                            info!("Entity {:?} is inside the mouse square region.", entity);
+                            // info!("Entity {:?} is inside the mouse square region.", entity);
                             // Add them to the highlighted entities hashmap
                             highlighted_entities.0.insert(entity);
 

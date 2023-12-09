@@ -48,51 +48,51 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
         BloomSettings::default(),
     ));
 
-    commands
-        .spawn((
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    flex_direction: FlexDirection::Row,
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::SpaceBetween,
-                    ..default()
-                },
-                ..default()
-            },
-            Menu,
-        ))
-        .with_children(|children| {
-            let button_colors = ButtonColors::default();
-            children
-                .spawn((
-                    ButtonBundle {
-                        style: Style {
-                            width: Val::Px(140.0),
-                            height: Val::Px(50.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..Default::default()
-                        },
-                        background_color: button_colors.normal.into(),
-                        ..Default::default()
-                    },
-                    button_colors,
-                    ChangeState(GameState::Playing),
-                    StartLevel("world.ldtk"),
-                ))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Play default world",
-                        TextStyle {
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                            ..default()
-                        },
-                    ));
-                });
-        });
+    // commands
+    //     .spawn((
+    //         NodeBundle {
+    //             style: Style {
+    //                 width: Val::Percent(100.0),
+    //                 height: Val::Percent(100.0),
+    //                 flex_direction: FlexDirection::Row,
+    //                 align_items: AlignItems::Center,
+    //                 justify_content: JustifyContent::SpaceBetween,
+    //                 ..default()
+    //             },
+    //             ..default()
+    //         },
+    //         Menu,
+    //     ))
+    //     .with_children(|children| {
+    //         let button_colors = ButtonColors::default();
+    //         children
+    //             .spawn((
+    //                 ButtonBundle {
+    //                     style: Style {
+    //                         width: Val::Px(140.0),
+    //                         height: Val::Px(50.0),
+    //                         justify_content: JustifyContent::Center,
+    //                         align_items: AlignItems::Center,
+    //                         ..Default::default()
+    //                     },
+    //                     background_color: button_colors.normal.into(),
+    //                     ..Default::default()
+    //                 },
+    //                 button_colors,
+    //                 ChangeState(GameState::Playing),
+    //                 StartLevel("world.ldtk"),
+    //             ))
+    //             .with_children(|parent| {
+    //                 parent.spawn(TextBundle::from_section(
+    //                     "Play default world",
+    //                     TextStyle {
+    //                         font_size: 40.0,
+    //                         color: Color::rgb(0.9, 0.9, 0.9),
+    //                         ..default()
+    //                     },
+    //                 ));
+    //             });
+    //     });
     commands
         .spawn((
             NodeBundle {
@@ -129,7 +129,7 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
-                        "Play demo world",
+                        "Play",
                         TextStyle {
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),

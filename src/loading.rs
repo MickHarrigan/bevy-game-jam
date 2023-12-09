@@ -43,7 +43,7 @@ pub struct TextureAssets {
         offset_x = 0.,
         offset_y = 0.
     ))]
-    #[asset(path = "shmup.png")]
+    #[asset(path = "textures/shmup.png")]
     pub shmup: Handle<TextureAtlas>,
     #[asset(texture_atlas(
         tile_size_x = 32.,
@@ -55,6 +55,6 @@ pub struct TextureAssets {
         offset_x = 0.,
         offset_y = 0.
     ))]
-    #[asset(path = "airplanes.png")]
+    #[asset(path = "textures/airplanes.png")]
     pub planes: Handle<TextureAtlas>,
 }
