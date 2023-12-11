@@ -40,7 +40,7 @@ use bevy::app::App;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 #[cfg(debug_assertions)]
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use crate::interactions::InteractionsPlugin;
 
 // This example game uses States to separate logic
@@ -80,7 +80,7 @@ impl Plugin for GamePlugin {
                 DebugPlugin,
                 FrameTimeDiagnosticsPlugin,
                 LogDiagnosticsPlugin::default(),
-                WorldInspectorPlugin::new(),
+                // WorldInspectorPlugin::new(),
             ))
             .add_systems(Startup, setup_entity_count)
             .add_systems(Update, update_entity_count);
