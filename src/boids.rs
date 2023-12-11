@@ -23,6 +23,7 @@ pub fn create_boid_group(
     }
     let height = level_data.level_height;
     let width = level_data.level_width;
+    info!("Maximum width {}, height {}", width, height);
     comms.spawn(BoidGroup::new(
         Vec2::new(0., 0.),
         Vec2::new(width, height),

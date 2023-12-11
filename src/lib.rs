@@ -24,14 +24,14 @@ mod interactions;
 mod tilemap;
 
 use crate::actions::ActionsPlugin;
-use crate::audio::InternalAudioPlugin;
+// use crate::audio::InternalAudioPlugin;
 use crate::debug::debug::DebugPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
-use crate::player::PlayerPlugin;
+// use crate::player::PlayerPlugin;
 
 use crate::bees::BeesPlugin;
-use crate::world::WorldPlugin;
+// use crate::world::WorldPlugin;
 use crate::camera::CameraPlugin;
 use crate::tilemap::MapPlugin;
 
@@ -55,8 +55,6 @@ enum GameState {
     Playing,
     // Here the menu is drawn and waiting for player interaction
     Menu,
-    // Additional state for pausing the game
-    Paused,
 }
 
 pub struct GamePlugin;
@@ -80,7 +78,7 @@ impl Plugin for GamePlugin {
         {
             app.add_plugins((
                 DebugPlugin,
-                // FrameTimeDiagnosticsPlugin,
+                FrameTimeDiagnosticsPlugin,
                 LogDiagnosticsPlugin::default(),
                 WorldInspectorPlugin::new(),
             ))

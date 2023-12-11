@@ -1,13 +1,14 @@
 use bevy::prelude::*;
-use rand::Rng;
+// use rand::Rng;
 
 use crate::{
-    bees::{Bee, BoidGroup, Collider, Velocity, BeeBehavior},
+    // bees::{Bee, BoidGroup, Collider, Velocity, BeeBehavior},
+    bees::BoidGroup,
     boids::Boid,
-    loading::TextureAssets,
+    // loading::TextureAssets,
     GameState,
 };
-use crate::interactions::Highlightable;
+// use crate::interactions::Highlightable;
 
 pub struct DebugPlugin;
 
@@ -22,7 +23,7 @@ impl Plugin for DebugPlugin {
                 (
                     visualize_quadtree,
                     visualize_boid_radius,
-                    spawn_random_boids,
+                    // spawn_random_boids,
                 )
                     .run_if(in_state(GameState::Playing)),
             );
@@ -37,7 +38,11 @@ pub struct Visualizer {
     pub boid_cone: bool,
 }
 
-pub fn visualize_quadtree(mut gizmos: Gizmos, vis: Res<Visualizer>, groups: Query<&BoidGroup>) {
+pub fn visualize_quadtree(mut gizmos: Gizmos, mut vis: ResMut<Visualizer>, groups: Query<&BoidGroup>, input: Res<Input<KeyCode>>) {
+    if input.just_pressed(KeyCode::Space) {
+        vis.quadtree = !vis.quadtree;
+        info!("Toggling quadtree to {:?}", vis.quadtree);
+    }
     if !vis.quadtree {
         return;
     }
@@ -80,38 +85,38 @@ pub fn visualize_boid_radius(
     }
 }
 
-fn spawn_random_boids(
-    mut commands: Commands,
-    input: Res<Input<KeyCode>>,
-    textures: Res<TextureAssets>,
-) {
-    // spawn in 1000 boids randomly in the field on press of some key
-    if input.just_pressed(KeyCode::Space) {
-        (0..1000).for_each(|_| {
-            let mut rng = rand::thread_rng();
-            let spawn_x = rng.gen_range(20.0..3820.0);
-            let spawn_y = rng.gen_range(20.0..2140.0);
-            commands.spawn((
-                SpriteSheetBundle {
-                    texture_atlas: textures.planes.clone(),
-                    sprite: TextureAtlasSprite::new(11),
-                    transform: Transform::from_xyz(
-                        spawn_x,
-                        spawn_y,
-                        5.0,
-                    ),
-                    ..default()
-                },
-                Bee,
-                Boid,
-                BeeBehavior::Wondering(Vec2::new(spawn_x, spawn_y)),
-                Highlightable,
-                Collider::new(5.0),
-                Velocity::default(),
-            ));
-        });
-    }
-}
+// fn spawn_random_boids(
+//     mut commands: Commands,
+//     input: Res<Input<KeyCode>>,
+//     textures: Res<TextureAssets>,
+// ) {
+//     // spawn in 1000 boids randomly in the field on press of some key
+//     if input.just_pressed(KeyCode::Space) {
+//         (0..1000).for_each(|_| {
+//             let mut rng = rand::thread_rng();
+//             let spawn_x = rng.gen_range(20.0..3820.0);
+//             let spawn_y = rng.gen_range(20.0..2140.0);
+//             commands.spawn((
+//                 SpriteSheetBundle {
+//                     texture_atlas: textures.planes.clone(),
+//                     sprite: TextureAtlasSprite::new(11),
+//                     transform: Transform::from_xyz(
+//                         spawn_x,
+//                         spawn_y,
+//                         5.0,
+//                     ),
+//                     ..default()
+//                 },
+//                 Bee,
+//                 Boid,
+//                 BeeBehavior::Wondering(Vec2::new(spawn_x, spawn_y)),
+//                 Highlightable,
+//                 Collider::new(5.0),
+//                 Velocity::default(),
+//             ));
+//         });
+//     }
+// }
 
 // this should create a window with a dropdown of all boidgroups and allow editing of all the values within
 // fn edit_boid_groups(groups: Query<&BoidGroup>) {

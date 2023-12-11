@@ -20,7 +20,7 @@ fn setup_camera_controls(
     mut q_camera: Query<&mut OrthographicProjection, With<Camera2d>>,
 ) {
     let mut projection = q_camera.single_mut();
-    projection.scale = 0.6;
+    projection.scale = 4.0;
 }
 
 fn panning_controls
@@ -30,13 +30,13 @@ fn panning_controls
     level_data: Res<LevelData>
 )
 {
-    let pan_speed = 2.0;
+    let pan_speed = 10.0;
     let mut cam_transform = q_cam.single_mut();
     // info!("Cam Translation {:?}", cam_transform.translation);
     if keys.pressed(KeyCode::W) || keys.pressed(KeyCode::Up) {
         cam_transform.translation.y += pan_speed;
-        if cam_transform.translation.y > level_data.level_height as f32 {
-            cam_transform.translation.y = level_data.level_height as f32;
+        if cam_transform.translation.y > level_data.level_height {
+            cam_transform.translation.y = level_data.level_height;
         }
     }
     if keys.pressed(KeyCode::A) || keys.pressed(KeyCode::Left) {
@@ -53,8 +53,8 @@ fn panning_controls
     }
     if keys.pressed(KeyCode::D) || keys.pressed(KeyCode::Right) {
         cam_transform.translation.x += pan_speed;
-        if cam_transform.translation.x > level_data.level_width as f32 {
-            cam_transform.translation.x = level_data.level_width as f32;
+        if cam_transform.translation.x > level_data.level_width {
+            cam_transform.translation.x = level_data.level_width;
         }
     }
 }
@@ -67,8 +67,8 @@ fn zooming_controls
 
 ) {
     let zoom_speed = 0.2;
-    let max_scale = 5.0;
-    let min_scale = 0.2;
+    let max_scale = 10.0;
+    let min_scale = 1.0;
     for ev in scroll_evr.read() {
         use bevy::input::mouse::MouseScrollUnit;
         let mut projection = q_camera.single_mut();

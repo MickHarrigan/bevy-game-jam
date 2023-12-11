@@ -16,6 +16,7 @@ use crate::{
 
 use crate::interactions::{MousePosition, Highlightable};
 use bevy::prelude::*;
+use crate::tilemap::FogTile;
 // use bevy::window::PrimaryWindow;
 
 pub struct BeesPlugin;
@@ -27,6 +28,7 @@ impl Plugin for BeesPlugin {
             .add_systems(Update, create_boid_group.run_if(in_state(GameState::Playing)))
             .add_systems(Update, place_bee.run_if(in_state(GameState::Playing)))
             .add_systems(Update, animate_wings.run_if(in_state(GameState::Playing)))
+            // .add_systems(Update, clear_fog.run_if(in_state(GameState::Playing)))
             .add_systems(
                 Update,
                 (build_or_update_quadtree, update_boids, move_system).run_if(
@@ -78,10 +80,10 @@ pub struct Bee;
 
 #[derive(Component)]
 pub enum BeeBehavior {
-    Traveling(Vec2), // Destination coordinates
-    Wondering(Vec2), // Point of origin coordinates
-    Exploring(Vec2), // Point of origin coordinates
-    Interacting(Vec2), // Coordinates of interactable object
+    // Traveling(Vec2), // Destination coordinates
+    Destination(Vec2), // Point of origin coordinates
+    // Exploring(Vec2), // Point of origin coordinates
+    // Interacting(Vec2), // Coordinates of interactable object
 }
 
 // Separate out these types of data???
@@ -125,11 +127,11 @@ impl BoidGroup {
             graph: QuadTree::new(region::Region::new(min, max)),
             id: team.0,
             count: 0,
-            separation: 0.3,
-            alignment: 0.4,
-            cohesion: 0.8,
-            speed: 40.0,
-            vision: 50.0,
+            separation: 0.5,
+            alignment: 0.3,
+            cohesion: 0.3,
+            speed: 240.0,
+            vision: 600.0,
         }
     }
 }
@@ -156,12 +158,12 @@ fn setup(mut _commands: Commands) {
 }
 
 #[derive(Component)]
-struct AnimationIndices {
-    first: usize,
-    last: usize,
+pub struct AnimationIndices {
+    pub first: usize,
+    pub last: usize,
 }
 #[derive(Component, Deref, DerefMut)]
-struct AnimationTimer(Timer);
+pub struct AnimationTimer(pub Timer);
 
 fn animate_wings(
     time: Res<Time>,
@@ -189,10 +191,16 @@ fn place_bee(
     textures: Res<TextureAssets>,
     mouse_input: Res<Input<MouseButton>>,
 ) {
+    let mut rng = rand::thread_rng();
+    let bee_body= if rng.gen::<bool>() {
+        textures.beebody1.clone()
+    } else {
+        textures.beebody2.clone()
+    };
     if mouse_input.just_pressed(MouseButton::Right) {
         let bee_entity = commands.spawn((
             SpriteBundle {
-                texture: textures.beebody1.clone(),
+                texture: bee_body,
                 transform: Transform::from_xyz(
                     mouse_position.0.x,
                     mouse_position.0.y,
@@ -201,20 +209,22 @@ fn place_bee(
                 ..default()
             },
             Bee,
-            BeeBehavior::Wondering(Vec2::new(mouse_position.0.x, mouse_position.0.y)),
+            BeeBehavior::Destination(Vec2::new(mouse_position.0.x, mouse_position.0.y)),
             Boid,
             Highlightable,
             Collider::new(5.0),
             Velocity::default(),
         )).id();
 
-        // Create the wings
-        let texture_atlas_handle = textures.bee1wingmap.clone();
-
         // Spawn the wings as a child of the bee body
+        let bee_wings= if rng.gen::<bool>() {
+            textures.bee1wingmap.clone()
+        } else {
+            textures.bee2wingmap.clone()
+        };
         commands.entity(bee_entity).with_children(|parent| {
             parent.spawn(SpriteSheetBundle {
-                texture_atlas: textures.bee1wingmap.clone(),
+                texture_atlas: bee_wings,
                 sprite: TextureAtlasSprite::new(0), // Set the initial sprite index
                 transform: Transform::from_xyz(0.0, 0.0, 1.0), // Adjust the position of the wings relative to the bee body
                 ..Default::default()
@@ -224,5 +234,28 @@ fn place_bee(
         });
 
         info!("Bee spawned");
+    }
+}
+
+fn _clear_fog(
+    mut commands: Commands,
+    bee_query: Query<&Transform, With<Bee>>,
+    mut fog_tile_query: Query<(Entity, &Transform), With<FogTile>>,
+) {
+    for bee_transform in bee_query.iter() {
+        // info!("Bee transform {:?}", bee_transform);
+        for (fog_tile_entity, fog_transform) in fog_tile_query.iter_mut() {
+            // info!("Fogtile transform {:?}", fog_transform);
+            let distance = bee_transform.translation.distance(fog_transform.translation);
+            info!("Distance {:?}", distance);
+            // Define a range where the fog tile should despawn (adjust this range as needed)
+            let despawn_range = 30000.0; // Modify this value to suit your needs
+
+            if distance < despawn_range {
+                // Despawn fog tile if it's within the despawn range of the bee
+                info!("Collision detected: Distance between bee and fog tile: {}", distance);
+                commands.entity(fog_tile_entity).despawn_recursive();
+            }
+        }
     }
 }
